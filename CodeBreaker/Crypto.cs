@@ -1,118 +1,76 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Numerics;
-using System.Threading.Tasks;
+using System.Security.Cryptography;
 
 namespace CodeBreaker
 {
     public static class Crypto
     {
-        private static RNGCryptoServiceProvider _rngProvider = new RNGCryptoServiceProvider();
-        private static byte[] _bytes;
-        private static Random _random = new Random(DateTime.Now.Millisecond);
-        public static BigInteger RSAEncrypt(BigInteger input, BigInteger? publicKey, BigInteger? n)
+        public static double DecryptChance(string text)
         {
-            if (publicKey == null || n == null) return input;
-            Console.WriteLine(input.ToByteArray().Length);
-            Console.WriteLine(publicKey.Value.ToByteArray().Length);
+            var strDict = new SortedDictionary<string, int>();
 
-            var outputInt = BigInteger.ModPow(input, publicKey.Value, n.Value);
-            return outputInt;
-        }
-
-        public static BigInteger RSADecrypt(BigInteger input, BigInteger? privateKey, BigInteger? n)
-        {
-            if (privateKey == null || n == null) return input;
-
-            var outputInt = BigInteger.ModPow(input, privateKey.Value, n.Value);
-            return outputInt;
-        }
-
-        public static Tuple<BigInteger,BigInteger, BigInteger> GenerateKeys(int size)
-        {
-            var csp = new RSACryptoServiceProvider(size);
-            var parameters = csp.ExportParameters(true);
-            var p = FromBigEndian(parameters.P);
-            var q = FromBigEndian(parameters.Q);
-            
-            
-
-            var n = BigInteger.Multiply(p,q);
-;           var tot = BigInteger.Multiply(p - 1, q - 1);
-            BigInteger e = 65537;
-            /*
-            do e = GetRandomBigInt(size);
-            while (1 >= e || e >= tot || BigInteger.GreatestCommonDivisor(e,tot) != 1);
-            */
-            var d = e.ModInverse(tot);
-            var test = new BigInteger(1234);
-            var testOut = BigInteger.ModPow(test, e, n);
-            Console.WriteLine(test);
-            Console.WriteLine(testOut);
-            Console.WriteLine(BigInteger.ModPow(testOut, d, n));
-
-            return new Tuple<BigInteger, BigInteger, BigInteger>(e,d,n);
-        }
-
-        private static bool PrimeTest(BigInteger n, int k, int size)
-        {
-            if (n < 2 || n % 2 == 0) return n == 2;
-            var s = n - 1;
-            while (s % 2 == 0) s >>= 1;
-
-            var isPrime = true;
-            Parallel.For(0, k, i =>
+            var list = text.ToUpper().Split(" ,!.?:;\"()[]{}*"
+                .ToCharArray()).ToList();
+            foreach (var cha in list)
             {
-                var a = GetRandomBigInt(size);
-                while (a >= n) a = GetRandomBigInt(size);
-                var temp = s;
-                var mod = (BigInteger)1;
-                for (var j = 0; j < temp; ++j) mod = mod * a % n;
-                while (temp != n - 1 && mod != 1 && mod != n - 1)
-                {
-                    mod = mod * mod % n;
-                    temp *= 2;
-                }
-
-                if (mod != n - 1 && temp % 2 == 0) isPrime = false;
-            });
-
-            return isPrime;
-        }
-
-        private static BigInteger GetRandomBigInt(int bits)
-        {
-            _bytes = new byte[bits/8];
-            _rngProvider.GetBytes(_bytes);
-
-            var bg = new BigInteger(_bytes);
-            if (bg.Sign == -1) bg *= -1;
-
-            return bg;
-        }
-
-        private static BigInteger ModInverse(this BigInteger a, BigInteger n)
-        {
-            var i = n;
-            var v = BigInteger.Zero;
-            var d = BigInteger.One;
-            while (a>0)
-            {
-                var t = i / a;
-                var x = a;
-                a = i % x;
-                i = x;
-                x = d;
-                d = v - t*x;
-                v = x;
+                var count = 1;
+                if (strDict.ContainsKey(cha))
+                    count = strDict[cha] + 1;
+                strDict[cha] = count;
             }
-            v %= n;
-            if (v<0) v = (v+n)%n;
-            return v;
+
+            if (strDict.Count == 0) return 0;
+
+            var wordCount = 0.00;
+            foreach (var str in strDict.Keys)
+            {
+                var strLen = (double) str.Length;
+                var amountLegible = str.ToCharArray()
+                    .Select(Convert.ToInt32)
+                    .Count(chaInt => chaInt <= 90 && chaInt >= 65 || chaInt == 39);
+                if (amountLegible / strLen >= .95)
+                    wordCount++;
+            }
+
+            var result = wordCount / strDict.Count;
+            //Console.WriteLine(result);
+            return result;
         }
 
-        private static BigInteger FromBigEndian(byte[] p)
+        public static List<Tuple<int,int>> CompareNWithTotient(int k)
+        {
+            var data = new List<Tuple<int, int>>();
+            for (var i = 384; i < k; i+=8)
+            {
+                var csp = new RSACryptoServiceProvider(i);
+                var parameters = csp.ExportParameters(true);
+                var p = FromBigEndian(parameters.P);
+                var q = FromBigEndian(parameters.Q);
+                var n = BigInteger.Multiply(p, q);
+                var tot = BigInteger.Multiply(p - 1, q - 1);
+                //Console.WriteLine("N: "+ n);
+                //Console.WriteLine("Totient: " + tot);
+
+                var nStr = n.ToString();
+                var totStr = tot.ToString();
+                var j = 0;
+                for (; j < nStr.Length; j++)
+                {
+                    if (nStr[j] != totStr[j]) break;
+                }
+                //Console.WriteLine("N Length: " + nStr.Length);
+                //Console.WriteLine("Tot Length: " + totStr.Length);
+                //Console.WriteLine("Significant digits in common: "+ j);
+                data.Add(new Tuple<int, int>(nStr.Length,j));
+            }
+
+            return data;
+        }
+
+        public static BigInteger FromBigEndian(byte[] p)
         {
             var q = p.Reverse().ToArray();
             return new BigInteger((p[0] < 128 ? q : q.Concat(new byte[] { 0 })).ToArray());

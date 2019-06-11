@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Numerics;
 
@@ -67,28 +66,6 @@ namespace CodeBreaker
             
 
             return new Tuple<BigInteger, BigInteger, BigInteger>(e,d,n);
-        }
-
-        private static BigInteger ModInverse(this BigInteger a, BigInteger n)
-        {
-            var i = n;
-            var v = BigInteger.Zero;
-            var d = BigInteger.One;
-            while (a>0)
-            {
-                var t = i / a;
-                var x = a;
-                a = i % x;
-                i = x;
-                x = d;
-                d = v - t*x;
-                v = x;
-            }
-            v %= n;
-            if (v<0) v = (v+n)%n;
-            return v;
-        }
-
-        
+        }        
     }
 }

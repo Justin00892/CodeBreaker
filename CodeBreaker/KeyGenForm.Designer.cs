@@ -28,14 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.keySizeLabel = new System.Windows.Forms.Label();
             this.keyWarningLabel = new System.Windows.Forms.Label();
             this.runButton = new System.Windows.Forms.Button();
             this.keySizeBox = new System.Windows.Forms.NumericUpDown();
             this.dataChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.rangeLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.keySizeBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataChart)).BeginInit();
             this.SuspendLayout();
@@ -97,32 +98,44 @@
             // 
             // dataChart
             // 
-            chartArea1.AxisX.Title = "Modulus & Totient Size (# Digits)";
-            chartArea1.AxisY.Maximum = 100D;
-            chartArea1.AxisY.Minimum = 0D;
-            chartArea1.AxisY.Title = "Common Significant Digits";
-            chartArea1.AxisY2.IsMarginVisible = false;
-            chartArea1.Name = "ChartArea1";
-            this.dataChart.ChartAreas.Add(chartArea1);
-            legend1.Name = "Legend1";
-            this.dataChart.Legends.Add(legend1);
+            chartArea2.AxisX.Title = "Modulus & Totient Size (# Digits)";
+            chartArea2.AxisY.Maximum = 100D;
+            chartArea2.AxisY.Minimum = 0D;
+            chartArea2.AxisY.Title = "Common Significant Digits";
+            chartArea2.AxisY2.IsMarginVisible = false;
+            chartArea2.Name = "ChartArea1";
+            this.dataChart.ChartAreas.Add(chartArea2);
+            legend2.Name = "Legend1";
+            this.dataChart.Legends.Add(legend2);
             this.dataChart.Location = new System.Drawing.Point(12, 63);
             this.dataChart.Name = "dataChart";
-            this.dataChart.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.EarthTones;
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.dataChart.Series.Add(series1);
+            this.dataChart.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.dataChart.Series.Add(series2);
             this.dataChart.Size = new System.Drawing.Size(675, 375);
             this.dataChart.TabIndex = 6;
             this.dataChart.Text = "dataChart";
+            // 
+            // rangeLabel
+            // 
+            this.rangeLabel.AutoSize = true;
+            this.rangeLabel.Location = new System.Drawing.Point(12, 443);
+            this.rangeLabel.Name = "rangeLabel";
+            this.rangeLabel.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.rangeLabel.Size = new System.Drawing.Size(115, 17);
+            this.rangeLabel.TabIndex = 7;
+            this.rangeLabel.Text = "Average Range: ";
+            this.rangeLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // KeyGenForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(699, 450);
+            this.ClientSize = new System.Drawing.Size(699, 469);
+            this.Controls.Add(this.rangeLabel);
             this.Controls.Add(this.dataChart);
             this.Controls.Add(this.keySizeBox);
             this.Controls.Add(this.runButton);
@@ -144,5 +157,6 @@
         private System.Windows.Forms.Button runButton;
         private System.Windows.Forms.NumericUpDown keySizeBox;
         private System.Windows.Forms.DataVisualization.Charting.Chart dataChart;
+        private System.Windows.Forms.Label rangeLabel;
     }
 }

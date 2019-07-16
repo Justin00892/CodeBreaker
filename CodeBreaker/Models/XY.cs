@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace CodeBreaker
+namespace CodeBreaker.Models
 {
     public class XY
     {
@@ -11,10 +11,11 @@ namespace CodeBreaker
         public BigInteger Q { get; }
         public BigInteger N { get; }
         public BigInteger Totient { get; }
+        public double Diff { get; set; }
 
-        public XY(BigInteger p, BigInteger q, BigInteger n, BigInteger totient, int y)
+        public XY(BigInteger p, BigInteger q, BigInteger n, BigInteger totient, int x,int y)
         {
-            X = n.ToString().Length;
+            X = x;
             Y = y;
             N = n;
             P = p;

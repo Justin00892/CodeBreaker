@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CodeBreaker.Models;
 
 namespace CodeBreaker
 {
     public class Stats
     {
         public List<XY> Points { get; }
-        public double Slope { get; private set; }
-        public double Intercept { get; private set; }
+        public double SizeSlope { get; private set; }
+        public double SizeIntercept { get; private set; }
+        public double DistanceSlope { get; private set; }
+        public double DistanceIntercept { get; private set; }
 
         public Stats()
         {
@@ -24,17 +27,16 @@ namespace CodeBreaker
             return Math.Sqrt(sum / (Points.Count - 1));
         }
 
-        public void LinearRegression()
+        public void LinearRegressionSize()
         {
             var n = Points.Count;
             var xySum = (double)Points.Select(d => d.X * d.Y).Sum();
             var xSum = (double)Points.Select(d => d.X).Sum();
             var ySum = (double)Points.Select(d => d.Y).Sum();
             var xSquareSum = (double) Points.Select(d => d.X * d.X).Sum();
-            Slope = (n*xySum - xSum*ySum)/(n*xSquareSum - xSum*xSum);
+            SizeSlope = (n*xySum - xSum*ySum)/(n*xSquareSum - xSum*xSum);
 
-            Intercept = ySum / n - Slope * (xSum / n);
+            SizeIntercept = ySum / n - SizeSlope * (xSum / n);
         }
-
     }
 }

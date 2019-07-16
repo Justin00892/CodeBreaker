@@ -16,6 +16,7 @@ namespace CodeBreaker
         {
             InitializeComponent();
             dataChart.Series.Clear();
+            distanceChart.Series.Clear();
         }
 
         private async void RunButton_Click(object sender, EventArgs e)
@@ -28,7 +29,7 @@ namespace CodeBreaker
             {
                 keyWarningLabel.Text = "";
                 _size = (int)enteredSize;
-                _data = await Task<Stats>.Factory.StartNew(() => Crypto.CompareNWithTotient(_size,10,false));
+                _data = await Task<Stats>.Factory.StartNew(() => Crypto.CompareNWithTotient(_size,10,true));
                 MakeGraph(_data);
             }
 
@@ -60,12 +61,20 @@ namespace CodeBreaker
 
             var xMin = series.Points.FindMinByValue("X")?.XValue ?? 0;
             var xMax = series.Points.FindMaxByValue("X")?.XValue ?? 1;
-            var minPoint = data.Intercept + data.Slope * xMin;
-            var maxPoint = data.Intercept + data.Slope * xMax;
+            var minPoint = data.SizeIntercept + data.SizeSlope * xMin;
+            var maxPoint = data.SizeIntercept + data.SizeSlope * xMax;
             regressionLine.Points.AddXY(xMin, minPoint);
             regressionLine.Points.AddXY(xMax, maxPoint);
 
             dataChart.Refresh();
+
+            var distanceSeries = distanceChart.Series.FindByName("Data") ?? distanceChart.Series.Add("Data");
+            distanceSeries.ChartType = SeriesChartType.Point;
+
+            foreach (var xy in data.Points)
+                distanceSeries.Points.AddXY(xy.X, xy.Diff);
+
+            distanceChart.Refresh();
         }
 
         private async void TestButton_Click(object sender, EventArgs e)

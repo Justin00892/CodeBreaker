@@ -65,26 +65,33 @@ namespace CodeBreaker
                     var j = 0;
                     for (; j < nStr.Length; j++) if (nStr[j] != totStr[j]) break;
 
-                    data.Points.Add(new XY(p,q,n,tot,j));
+                    data.Points.Add(new XY(p,q,n,tot,i,j));
                 }
             }
-            data.LinearRegression();
+            data.LinearRegressionSize();
+
             foreach (var xy in data.Points)
             {
-                var expectedSigDigitsP =(int)(data.Intercept + data.Slope * xy.P.ToString().Length);
-                var expectedSigDigitsQ =(int)(data.Intercept + data.Slope * xy.Q.ToString().Length);
-                var subP = BigInteger.Parse(xy.P.ToString().Substring(0, expectedSigDigitsP));
-                var subQ = BigInteger.Parse(xy.Q.ToString().Substring(0, expectedSigDigitsQ));
-                if (!debug) continue;
+                var expectedSigDigits = (int)(data.SizeIntercept + data.SizeSlope * xy.X);
+                var baseNString = xy.N.ToString().Substring(0, expectedSigDigits);
+                var maxString = xy.N.ToString().Substring(expectedSigDigits);
+                var max = BigInteger.Parse(maxString);
+                var min = BigInteger.Zero;
+                var midpoint = BigInteger.Divide(max, 2);
+                var tot = xy.Totient.ToString().Substring(expectedSigDigits);
+                var difFromMid = BigInteger.Abs(BigInteger.Subtract(BigInteger.Parse(tot), midpoint));
+                xy.Diff = double.Parse(difFromMid.ToString());
+            }
+
+            if (!debug) return data;
+
+            foreach (var xy in data.Points)
+            {
+                
                 Console.WriteLine("\nP:\n"+xy.P);
-                Console.WriteLine("SubP:\n"+subP);
                 Console.WriteLine("\nQ:\n"+xy.Q);
-                Console.WriteLine("SubQ:\n"+subQ);
                 Console.WriteLine("\nN:\n"+xy.N);
-                Console.WriteLine("SubN:\n" + BigInteger.Multiply(subP,subQ));
                 Console.WriteLine("\nTotient:\n"+xy.Totient);
-                Console.WriteLine("SubTotient:\n" + BigInteger.Multiply(subP-1,subQ-1));
-                Console.WriteLine("\nN-Totient:\n" + BigInteger.Subtract(xy.N,xy.Totient));
             }
             return data;
         }
@@ -119,7 +126,7 @@ namespace CodeBreaker
         {
             var totient = BigInteger.MinusOne;
             var nSize = n.ToString().Length;
-            var expectedSigDigits =(int)(data.Intercept + data.Slope * nSize);
+            var expectedSigDigits =(int)(data.SizeIntercept + data.SizeSlope * nSize);
 
             var baseNString = n.ToString().Substring(0,expectedSigDigits);
             var maxString = n.ToString().Substring(expectedSigDigits);

@@ -79,15 +79,22 @@ namespace CodeBreaker
                 var min = BigInteger.Zero;
                 var midpoint = BigInteger.Divide(max, 2);
                 var tot = xy.Totient.ToString().Substring(expectedSigDigits);
-                var difFromMid = BigInteger.Abs(BigInteger.Subtract(BigInteger.Parse(tot), midpoint));
-                xy.Diff = double.Parse(difFromMid.ToString());
+                var difFromMid = double.Parse(BigInteger.Subtract(BigInteger.Parse(tot), midpoint).ToString());
+                var diffSplit = difFromMid.ToString().Split('E');
+                xy.Diff = double.Parse(diffSplit[0]);
+                xy.DiffMagnitude = int.Parse(diffSplit[1]);
+            }
+
+            foreach (var xy in data.Points)
+            {
+                if(xy.DiffMagnitude - 55 <= 0) continue;
+                xy.Diff *= (xy.DiffMagnitude - 55);
             }
 
             if (!debug) return data;
 
             foreach (var xy in data.Points)
             {
-                
                 Console.WriteLine("\nP:\n"+xy.P);
                 Console.WriteLine("\nQ:\n"+xy.Q);
                 Console.WriteLine("\nN:\n"+xy.N);
@@ -163,16 +170,16 @@ namespace CodeBreaker
             while (bi<max)
             {
                 yield return bi;
-                bi += 1;     
+                bi += 2;     
             }
         }
         private static IEnumerable<BigInteger> BigIntSequenceReverse(BigInteger min,BigInteger max)
         {
-            var bi = max;
+            var bi = max-1;
             while (bi>min)
-            {
+            {                
                 yield return bi;
-                bi -= 1;     
+                bi -= 2;     
             }
         }
 

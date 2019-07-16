@@ -39,7 +39,7 @@ namespace CodeBreaker
             return new Tuple<string,BigInteger>(output,privateKey);
         }
 
-        public static Tuple<BigInteger,BigInteger, BigInteger> GenerateKeys(int size, bool debug)
+        public static Tuple<BigInteger,BigInteger, BigInteger, BigInteger> GenerateKeys(int size, bool debug)
         {
             var csp = new RSACryptoServiceProvider(size);
             var parameters = csp.ExportParameters(true);
@@ -65,7 +65,7 @@ namespace CodeBreaker
             }
             
 
-            return new Tuple<BigInteger, BigInteger, BigInteger>(e,d,n);
+            return new Tuple<BigInteger, BigInteger, BigInteger, BigInteger>(e,d,n,tot);
         }        
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Numerics;
 
-namespace Code
+namespace CodeBreaker.Models
 {
     public class Prime
     {

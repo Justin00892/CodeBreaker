@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Security.Cryptography;
-using Code;
+using System.Threading;
+using System.Threading.Tasks;
+using CodeBreaker.Models;
 
 namespace CodeBreaker
 {
@@ -52,9 +54,9 @@ namespace CodeBreaker
                     var csp = new RSACryptoServiceProvider(i);
                     var parameters = csp.ExportParameters(true);
                     var p = FromBigEndian(parameters.P);
-                    StorePrime(p,i);
+                    //StorePrime(p,i);
                     var q = FromBigEndian(parameters.Q);
-                    StorePrime(q,i);
+                    //StorePrime(q,i);
                     var n = BigInteger.Multiply(p, q);
                     var tot = BigInteger.Multiply(p - 1, q - 1);
 
@@ -73,18 +75,16 @@ namespace CodeBreaker
                 var expectedSigDigitsQ =(int)(data.Intercept + data.Slope * xy.Q.ToString().Length);
                 var subP = BigInteger.Parse(xy.P.ToString().Substring(0, expectedSigDigitsP));
                 var subQ = BigInteger.Parse(xy.Q.ToString().Substring(0, expectedSigDigitsQ));
-                if (debug)
-                {
-                    Console.WriteLine("\nP:\n"+xy.P);
-                    Console.WriteLine("SubP:\n"+subP);
-                    Console.WriteLine("\nQ:\n"+xy.Q);
-                    Console.WriteLine("SubQ:\n"+subQ);
-                    Console.WriteLine("\nN:\n"+xy.N);
-                    Console.WriteLine("SubN:\n" + BigInteger.Multiply(subP,subQ));
-                    Console.WriteLine("\nTotient:\n"+xy.Totient);
-                    Console.WriteLine("SubTotient:\n" + BigInteger.Multiply(subP-1,subQ-1));
-                    Console.WriteLine("\nN-Totient:\n" + BigInteger.Subtract(xy.N,xy.Totient));
-                }
+                if (!debug) continue;
+                Console.WriteLine("\nP:\n"+xy.P);
+                Console.WriteLine("SubP:\n"+subP);
+                Console.WriteLine("\nQ:\n"+xy.Q);
+                Console.WriteLine("SubQ:\n"+subQ);
+                Console.WriteLine("\nN:\n"+xy.N);
+                Console.WriteLine("SubN:\n" + BigInteger.Multiply(subP,subQ));
+                Console.WriteLine("\nTotient:\n"+xy.Totient);
+                Console.WriteLine("SubTotient:\n" + BigInteger.Multiply(subP-1,subQ-1));
+                Console.WriteLine("\nN-Totient:\n" + BigInteger.Subtract(xy.N,xy.Totient));
             }
             return data;
         }
@@ -101,9 +101,9 @@ namespace CodeBreaker
                     if (context.Primes.Any(pr => pr.NumberString == q.ToString())
                         || IsPrime(q))
                     {
-                        Console.WriteLine("N: "+n.ToString());
-                        Console.WriteLine("P: "+p.ToString());
-                        Console.WriteLine("Q: "+q.ToString());
+                        Console.WriteLine("N: "+n);
+                        Console.WriteLine("P: "+p);
+                        Console.WriteLine("Q: "+q);
                         break;
                     }                   
                 }
@@ -115,28 +115,42 @@ namespace CodeBreaker
             return BigInteger.Multiply(FromBigEndian(p),FromBigEndian(q));
         }
 
-        public static BigInteger GuessTotient(Stats data, BigInteger n, BigInteger e)
+        public static BigInteger GuessTotient(Stats data, BigInteger n, BigInteger e, BigInteger realTotient)
         {
-            var totient = BigInteger.One;
+            var totient = BigInteger.MinusOne;
             var nSize = n.ToString().Length;
             var expectedSigDigits =(int)(data.Intercept + data.Slope * nSize);
-            
-            var baseNMinString = n.ToString().Substring(0,expectedSigDigits);
-            var temp = BigInteger.Parse(baseNMinString);
-            temp++;
-            var baseNMaxString = temp.ToString();
 
-            for (var i = baseNMinString.Length; i <= nSize; i++) baseNMinString += "0";
-            for (var i = baseNMaxString.Length; i <= nSize; i++) baseNMaxString += "0";
+            var baseNString = n.ToString().Substring(0,expectedSigDigits);
+            var maxString = n.ToString().Substring(expectedSigDigits);
+            var max = BigInteger.Parse(maxString);
+            var min = BigInteger.Zero;
+            var midpoint = BigInteger.Divide(max,2);
+            var target = BigInteger.Parse(realTotient.ToString().Substring(expectedSigDigits));
 
-            var min = BigInteger.Parse(baseNMinString);
-            var max = BigInteger.Parse(baseNMaxString);
-            
-
-            return totient;
+            var source = new CancellationTokenSource();
+            Parallel.Invoke(new ParallelOptions{CancellationToken = source.Token, MaxDegreeOfParallelism = Environment.ProcessorCount},
+                () => Parallel.ForEach(BigIntSequence(midpoint, max), i =>
+                    {
+                        //Console.WriteLine("mid to max: "+i);
+                        if (BigInteger.Compare(i,target) != 0) return;
+                        Console.WriteLine("mid to max: " + i);
+                        totient = i;
+                        source.Cancel();
+                    }),
+                ()=> Parallel.ForEach(BigIntSequenceReverse(min, midpoint), i =>
+                    {
+                        //Console.WriteLine("min to mid: "+i);
+                        if (BigInteger.Compare(i, target) != 0) return;
+                        Console.WriteLine("mid to max: " + i);
+                        totient = i;
+                        source.Cancel();
+                    })
+            );
+            return BigInteger.Parse(baseNString+totient);
         }
 
-        public static IEnumerable<BigInteger> BigIntSequence(BigInteger min,BigInteger max)
+        private static IEnumerable<BigInteger> BigIntSequence(BigInteger min,BigInteger max)
         {
             var bi = min;
             while (bi<max)
@@ -145,6 +159,16 @@ namespace CodeBreaker
                 bi += 1;     
             }
         }
+        private static IEnumerable<BigInteger> BigIntSequenceReverse(BigInteger min,BigInteger max)
+        {
+            var bi = max;
+            while (bi>min)
+            {
+                yield return bi;
+                bi -= 1;     
+            }
+        }
+
 
         public static BigInteger FromBigEndian(byte[] p)
         {
@@ -194,6 +218,7 @@ namespace CodeBreaker
                 return false;
             }
 
+            return false;
         }
     }
 }

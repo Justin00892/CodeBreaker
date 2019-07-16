@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -27,7 +28,7 @@ namespace CodeBreaker
             {
                 keyWarningLabel.Text = "";
                 _size = (int)enteredSize;
-                _data = await Task<Stats>.Factory.StartNew(() => Crypto.CompareNWithTotient(_size,10,true));
+                _data = await Task<Stats>.Factory.StartNew(() => Crypto.CompareNWithTotient(_size,10,false));
                 MakeGraph(_data);
             }
 
@@ -69,12 +70,20 @@ namespace CodeBreaker
 
         private async void TestButton_Click(object sender, EventArgs e)
         {
-            var keys = await Task<Tuple<BigInteger, BigInteger, BigInteger>>.Factory
-                .StartNew(() => RSA.GenerateKeys(_size,false));
+            testButton.Enabled = false;
+            var keys = await Task<Tuple<BigInteger, BigInteger, BigInteger,BigInteger>>.Factory
+                .StartNew(() => RSA.GenerateKeys(384,false));
             var publicKey = keys.Item1;
             var n = keys.Item3;
+            //only for testing
+            var realTotient = keys.Item4;
 
-            var totientGuess = await Task<BigInteger>.Factory.StartNew(()=> Crypto.GuessTotient(_data,n,publicKey));
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var totientGuess = await Task<BigInteger>.Factory.StartNew(()=> Crypto.GuessTotient(_data,n,publicKey,realTotient));
+            stopwatch.Stop();
+            Console.WriteLine(stopwatch.Elapsed);
+            testButton.Enabled = true;
         }
     }
 }

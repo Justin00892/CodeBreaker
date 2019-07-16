@@ -1,5 +1,4 @@
 ﻿using System.Data.Entity;
-using Code;
 using CodeBreaker.Models;
 
 namespace CodeBreaker

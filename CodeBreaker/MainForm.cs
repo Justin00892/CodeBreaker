@@ -60,7 +60,7 @@ namespace CodeBreaker
         {
             DisableButtons();
             generateButton.Enabled = false;
-            var keys = await Task<Tuple<BigInteger, BigInteger, BigInteger>>.Factory
+            var keys = await Task<Tuple<BigInteger, BigInteger, BigInteger,BigInteger>>.Factory
                 .StartNew(() => RSA.GenerateKeys(_size,true));
 
             _publicKey = keys.Item1;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
+using Code;
 
 namespace CodeBreaker
 {
@@ -52,7 +52,9 @@ namespace CodeBreaker
                     var csp = new RSACryptoServiceProvider(i);
                     var parameters = csp.ExportParameters(true);
                     var p = FromBigEndian(parameters.P);
+                    StorePrime(p,i);
                     var q = FromBigEndian(parameters.Q);
+                    StorePrime(q,i);
                     var n = BigInteger.Multiply(p, q);
                     var tot = BigInteger.Multiply(p - 1, q - 1);
 
@@ -73,22 +75,39 @@ namespace CodeBreaker
                 var subQ = BigInteger.Parse(xy.Q.ToString().Substring(0, expectedSigDigitsQ));
                 if (debug)
                 {
-                    Console.WriteLine("P:\n"+xy.P);
-                    Console.WriteLine("\nSubP:\n"+subP);
-                    Console.WriteLine("Q:\n"+xy.Q);
-                    Console.WriteLine("\nSubQ:\n"+subQ);
-                    Console.WriteLine("N:\n"+xy.N);
+                    Console.WriteLine("\nP:\n"+xy.P);
+                    Console.WriteLine("SubP:\n"+subP);
+                    Console.WriteLine("\nQ:\n"+xy.Q);
+                    Console.WriteLine("SubQ:\n"+subQ);
+                    Console.WriteLine("\nN:\n"+xy.N);
                     Console.WriteLine("SubN:\n" + BigInteger.Multiply(subP,subQ));
                     Console.WriteLine("\nTotient:\n"+xy.Totient);
                     Console.WriteLine("SubTotient:\n" + BigInteger.Multiply(subP-1,subQ-1));
+                    Console.WriteLine("\nN-Totient:\n" + BigInteger.Subtract(xy.N,xy.Totient));
                 }
             }
             return data;
         }
 
-        public static void AttemptFactor(BigInteger n)
+        public static void AttemptFactor(BigInteger n, int size)
         {
-            
+            using (var context = new PrimeContext())
+            {
+                foreach (var s in context.Primes.Where(p => p.Size == size))
+                {
+                    var p = BigInteger.Parse(s.NumberString);
+                    var q = BigInteger.Divide(n, p);
+
+                    if (context.Primes.Any(pr => pr.NumberString == q.ToString())
+                        || IsPrime(q))
+                    {
+                        Console.WriteLine("N: "+n.ToString());
+                        Console.WriteLine("P: "+p.ToString());
+                        Console.WriteLine("Q: "+q.ToString());
+                        break;
+                    }                   
+                }
+            }
         }
 
         public static BigInteger GetN(byte[] p, byte[] q)
@@ -112,8 +131,7 @@ namespace CodeBreaker
 
             var min = BigInteger.Parse(baseNMinString);
             var max = BigInteger.Parse(baseNMaxString);
-
-            Parallel.ForEach(BigIntSequence(min, max), i => Console.WriteLine(i));
+            
 
             return totient;
         }
@@ -152,6 +170,30 @@ namespace CodeBreaker
             v %= n;
             if (v<0) v = (v+n)%n;
             return v;
+        }
+
+        public static void StorePrime(BigInteger p, int s)
+        {
+            using (var context = new PrimeContext())
+            {
+                var prime = new Prime {NumberString = p.ToString(), Size = s};
+                if (context.Primes.All(pr => pr.NumberString != prime.NumberString))
+                {
+                    context.Primes.Add(prime);
+                    context.SaveChanges();
+                }
+            }
+        }
+
+        public static bool IsPrime(BigInteger num)
+        {
+            var numStr = num.ToString();
+            var lastChar = numStr[numStr.Length - 1];
+            if (new List<char>{'0','2','4','5','6','8'}.Contains(lastChar))
+            {
+                return false;
+            }
+
         }
     }
 }

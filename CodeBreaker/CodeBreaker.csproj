@@ -33,10 +33,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="MathNet.Numerics, Version=4.7.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MathNet.Numerics.4.7.0\lib\net461\MathNet.Numerics.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Serialization" />
@@ -60,6 +67,8 @@
     <Compile Include="KeyGenForm.Designer.cs">
       <DependentUpon>KeyGenForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\Prime.cs" />
+    <Compile Include="PrimeContext.cs" />
     <Compile Include="RSA.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -69,8 +78,8 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Stats.cs" />
-    <Compile Include="XY.cs" />
+    <Compile Include="Models\Stats.cs" />
+    <Compile Include="Models\XY.cs" />
     <EmbeddedResource Include="KeyGenForm.resx">
       <DependentUpon>KeyGenForm.cs</DependentUpon>
     </EmbeddedResource>

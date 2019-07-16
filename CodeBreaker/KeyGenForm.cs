@@ -3,12 +3,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.Numerics;
 
 namespace CodeBreaker
 {
     public partial class KeyGenForm : Form
     {
         private int _size = 384;
+        private Stats _data;
         public KeyGenForm()
         {
             InitializeComponent();
@@ -25,17 +27,8 @@ namespace CodeBreaker
             {
                 keyWarningLabel.Text = "";
                 _size = (int)enteredSize;
-                var data = await Task<Stats>.Factory.StartNew(() => Crypto.CompareNWithTotient(_size,10,false));
-                MakeGraph(data);
-
-                /*
-                var keys = await Task<Tuple<BigInteger, BigInteger, BigInteger>>.Factory
-                    .StartNew(() => RSA.GenerateKeys(_size,false));
-                var publicKey = keys.Item1;
-                var n = keys.Item3;
-
-                var totientGuess = await Task<BigInteger>.Factory.StartNew(()=> Crypto.GuessTotient(data,n,publicKey));
-                */
+                _data = await Task<Stats>.Factory.StartNew(() => Crypto.CompareNWithTotient(_size,10,true));
+                MakeGraph(_data);
             }
 
             runButton.Enabled = true;
@@ -72,6 +65,16 @@ namespace CodeBreaker
             regressionLine.Points.AddXY(xMax, maxPoint);
 
             dataChart.Refresh();
+        }
+
+        private async void TestButton_Click(object sender, EventArgs e)
+        {
+            var keys = await Task<Tuple<BigInteger, BigInteger, BigInteger>>.Factory
+                .StartNew(() => RSA.GenerateKeys(_size,false));
+            var publicKey = keys.Item1;
+            var n = keys.Item3;
+
+            var totientGuess = await Task<BigInteger>.Factory.StartNew(()=> Crypto.GuessTotient(_data,n,publicKey));
         }
     }
 }

@@ -81,8 +81,9 @@ namespace CodeBreaker
         private async void TestButton_Click(object sender, EventArgs e)
         {
             testButton.Enabled = false;
+            var keySize = 384;
             var keys = await Task<Tuple<BigInteger, BigInteger, BigInteger,BigInteger>>.Factory
-                .StartNew(() => RSA.GenerateKeys(384,false));
+                .StartNew(() => RSA.GenerateKeys(keySize,false));
             var publicKey = keys.Item1;
             var n = keys.Item3;
             //only for testing
@@ -90,7 +91,7 @@ namespace CodeBreaker
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            var totientGuess = await Task<BigInteger>.Factory.StartNew(()=> Crypto.GuessTotient(_data,n,publicKey,realTotient));
+            var totientGuess = await Task<BigInteger>.Factory.StartNew(()=> Crypto.GuessTotient(_data,n,keySize,publicKey,realTotient));
             stopwatch.Stop();
             Console.WriteLine(stopwatch.Elapsed);
             testButton.Enabled = true;

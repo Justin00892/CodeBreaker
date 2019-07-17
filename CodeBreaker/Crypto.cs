@@ -129,11 +129,10 @@ namespace CodeBreaker
             return BigInteger.Multiply(FromBigEndian(p),FromBigEndian(q));
         }
 
-        public static BigInteger GuessTotient(Stats data, BigInteger n, BigInteger e, BigInteger realTotient)
+        public static BigInteger GuessTotient(Stats data, BigInteger n, int keySize, BigInteger e, BigInteger realTotient)
         {
             var totient = BigInteger.MinusOne;
-            var nSize = n.ToString().Length;
-            var expectedSigDigits =(int)(data.SizeIntercept + data.SizeSlope * nSize);
+            var expectedSigDigits =(int)(data.SizeIntercept + data.SizeSlope * keySize);
 
             var baseNString = n.ToString().Substring(0,expectedSigDigits);
             var maxString = n.ToString().Substring(expectedSigDigits);
@@ -141,6 +140,9 @@ namespace CodeBreaker
             var min = BigInteger.Zero;
             var midpoint = BigInteger.Divide(max,2);
             var target = BigInteger.Parse(realTotient.ToString().Substring(expectedSigDigits));
+            var midpointLastDigit = midpoint.ToString()[midpoint.ToString().Length - 1];
+            if(!new List<char> {'0', '2', '4', '5', '6', '8'}.Contains(midpointLastDigit))
+                BigInteger.Add(midpoint,BigInteger.One);
 
             var source = new CancellationTokenSource();
             Parallel.Invoke(new ParallelOptions{CancellationToken = source.Token, MaxDegreeOfParallelism = Environment.ProcessorCount},
@@ -175,7 +177,7 @@ namespace CodeBreaker
         }
         private static IEnumerable<BigInteger> BigIntSequenceReverse(BigInteger min,BigInteger max)
         {
-            var bi = max-1;
+            var bi = max;
             while (bi>min)
             {                
                 yield return bi;

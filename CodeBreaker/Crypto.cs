@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using System.Security.Cryptography;
-using System.Threading;
 using System.Threading.Tasks;
 using CodeBreaker.Models;
 
@@ -73,22 +73,35 @@ namespace CodeBreaker
             foreach (var xy in data.Points)
             {
                 var expectedSigDigits = (int)(data.SizeIntercept + data.SizeSlope * xy.X);
-                var baseNString = xy.N.ToString().Substring(0, expectedSigDigits);
+                //var baseNString = xy.N.ToString().Substring(0, expectedSigDigits);
                 var maxString = xy.N.ToString().Substring(expectedSigDigits);
                 var max = BigInteger.Parse(maxString);
-                var min = BigInteger.Zero;
+                //var min = BigInteger.Zero;
                 var midpoint = BigInteger.Divide(max, 2);
                 var tot = xy.Totient.ToString().Substring(expectedSigDigits);
                 var difFromMid = double.Parse(BigInteger.Subtract(BigInteger.Parse(tot), midpoint).ToString());
-                var diffSplit = difFromMid.ToString().Split('E');
-                xy.Diff = double.Parse(diffSplit[0]);
+                var diffSplit = difFromMid.ToString(CultureInfo.InvariantCulture).Split('E');
+                var diffMax = double.Parse(BigInteger.Subtract(max,midpoint).ToString());
+                var diffMaxSplit = diffMax.ToString(CultureInfo.InvariantCulture).Split('E');
+                var diffMin = diffMax * -1;
+
+                xy.Diff = difFromMid;
+                xy.DiffMax = diffMax;
+                xy.DiffMin = diffMin;
                 xy.DiffMagnitude = int.Parse(diffSplit[1]);
+                xy.DiffMaxMagnitude = int.Parse(diffMaxSplit[1]);
             }
 
+            var maxMag = data.Points.Max(p => p.DiffMagnitude);
             foreach (var xy in data.Points)
             {
-                if(xy.DiffMagnitude - 55 <= 0) continue;
-                xy.Diff *= (xy.DiffMagnitude - 55);
+                xy.Diff /= Math.Pow(10, maxMag);
+                xy.DiffMax /= Math.Pow(10, maxMag);
+                xy.DiffMin /= Math.Pow(10, maxMag);
+
+                Console.WriteLine("\nMin: " + xy.DiffMin);
+                Console.WriteLine("Diff: " + xy.Diff);
+                Console.WriteLine("Max: " + xy.DiffMax);
             }
 
             if (!debug) return data;
@@ -124,11 +137,6 @@ namespace CodeBreaker
             }
         }
 
-        public static BigInteger GetN(byte[] p, byte[] q)
-        {
-            return BigInteger.Multiply(FromBigEndian(p),FromBigEndian(q));
-        }
-
         public static BigInteger GuessTotient(Stats data, BigInteger n, int keySize, BigInteger e, BigInteger realTotient)
         {
             var totient = BigInteger.MinusOne;
@@ -144,6 +152,24 @@ namespace CodeBreaker
             if(!new List<char> {'0', '2', '4', '5', '6', '8'}.Contains(midpointLastDigit))
                 BigInteger.Add(midpoint,BigInteger.One);
 
+            Parallel.ForEach(BigIntSequence(midpoint, max), (i, state) =>
+            {
+                //Console.WriteLine("mid to max: "+i);
+                if (BigInteger.Compare(i, target) != 0) return;
+                Console.WriteLine("mid to max: " + i);
+                totient = i;
+                state.Break();
+            });
+            if (BigInteger.Compare(totient, BigInteger.MinusOne) == 0)
+                Parallel.ForEach(BigIntSequenceReverse(min, midpoint), (i, state) =>
+                {
+                    //Console.WriteLine("min to mid: "+i);
+                    if (BigInteger.Compare(i, target) != 0) return;
+                    Console.WriteLine("mid to max: " + i);
+                    totient = i;
+                    state.Break();
+                });
+            /*
             var source = new CancellationTokenSource();
             Parallel.Invoke(new ParallelOptions{CancellationToken = source.Token, MaxDegreeOfParallelism = Environment.ProcessorCount},
                 () => Parallel.ForEach(BigIntSequence(midpoint, max), i =>
@@ -163,6 +189,7 @@ namespace CodeBreaker
                         source.Cancel();
                     })
             );
+            */
             return BigInteger.Parse(baseNString+totient);
         }
 

@@ -59,7 +59,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AES.cs" />
     <Compile Include="Crypto.cs" />
     <Compile Include="KeyGenForm.cs">
       <SubType>Form</SubType>

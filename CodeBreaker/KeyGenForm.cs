@@ -71,15 +71,10 @@ namespace CodeBreaker
 
             var distanceSeries = distanceChart.Series.FindByName("Data") ?? distanceChart.Series.Add("Data");
             distanceSeries.ChartType = SeriesChartType.Point;
-            var distanceBoundsSeries = distanceChart.Series.FindByName("Bounds") ?? distanceChart.Series.Add("Bounds");
-            distanceBoundsSeries.ChartType = SeriesChartType.Point;
-            distanceBoundsSeries.Color = Color.Red;
 
             foreach (var xy in data.Points)
             {
-                distanceSeries.Points.AddXY(xy.X, xy.Diff);
-                distanceBoundsSeries.Points.AddXY(xy.X, xy.DiffMin);
-                distanceBoundsSeries.Points.AddXY(xy.X, xy.DiffMax);
+                
             }
 
 

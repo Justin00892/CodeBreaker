@@ -1,5 +1,5 @@
-﻿using System.Data.Entity;
-using CodeBreaker.Models;
+﻿using CodeBreaker.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CodeBreaker
 {

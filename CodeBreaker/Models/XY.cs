@@ -11,11 +11,10 @@ namespace CodeBreaker.Models
         public BigInteger Q { get; }
         public BigInteger N { get; }
         public BigInteger Totient { get; }
-        public double Diff { get; set; }
-        public double DiffMax { get; set; }
-        public double DiffMin { get; set; }
-        public int DiffMagnitude { get; set; }
-        public int DiffMaxMagnitude { get; set; }
+        public double nDouble { get; set; }
+        public int nMagnitude { get; set; }
+        public double totDouble { get; set; }
+        public int totMagnitude { get; set; }
 
         public XY(BigInteger p, BigInteger q, BigInteger n, BigInteger totient, int x,int y)
         {

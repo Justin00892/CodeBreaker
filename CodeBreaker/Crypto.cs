@@ -76,32 +76,13 @@ namespace CodeBreaker
                 //var baseNString = xy.N.ToString().Substring(0, expectedSigDigits);
                 var maxString = xy.N.ToString().Substring(expectedSigDigits);
                 var max = BigInteger.Parse(maxString);
-                //var min = BigInteger.Zero;
+                var min = BigInteger.Zero;
                 var midpoint = BigInteger.Divide(max, 2);
                 var tot = xy.Totient.ToString().Substring(expectedSigDigits);
-                var difFromMid = double.Parse(BigInteger.Subtract(BigInteger.Parse(tot), midpoint).ToString());
-                var diffSplit = difFromMid.ToString(CultureInfo.InvariantCulture).Split('E');
-                var diffMax = double.Parse(BigInteger.Subtract(max,midpoint).ToString());
-                var diffMaxSplit = diffMax.ToString(CultureInfo.InvariantCulture).Split('E');
-                var diffMin = diffMax * -1;
 
-                xy.Diff = difFromMid;
-                xy.DiffMax = diffMax;
-                xy.DiffMin = diffMin;
-                xy.DiffMagnitude = int.Parse(diffSplit[1]);
-                xy.DiffMaxMagnitude = int.Parse(diffMaxSplit[1]);
-            }
-
-            var maxMag = data.Points.Max(p => p.DiffMagnitude);
-            foreach (var xy in data.Points)
-            {
-                xy.Diff /= Math.Pow(10, maxMag);
-                xy.DiffMax /= Math.Pow(10, maxMag);
-                xy.DiffMin /= Math.Pow(10, maxMag);
-
-                Console.WriteLine("\nMin: " + xy.DiffMin);
-                Console.WriteLine("Diff: " + xy.Diff);
-                Console.WriteLine("Max: " + xy.DiffMax);
+                var nDouble = double.Parse(max.ToString());
+                var nSplit = nDouble.ToString().Split('E');
+                
             }
 
             if (!debug) return data;

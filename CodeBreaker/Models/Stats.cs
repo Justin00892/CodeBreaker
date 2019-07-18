@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CodeBreaker.Models;
+using Extreme.Mathematics;
 
-namespace CodeBreaker
+namespace CodeBreaker.Models
 {
     public class Stats
     {
         public List<XY> Points { get; }
         public double SizeSlope { get; private set; }
         public double SizeIntercept { get; private set; }
-        public double DistanceSlope { get; private set; }
-        public double DistanceIntercept { get; private set; }
+
+        public BigFloat AverageRatio => BigFloat.Divide(Points.Sum(p => p.Ratio), Points.Count);
 
         public Stats()
         {

@@ -38,7 +38,6 @@
             this.keyWarningLabel = new System.Windows.Forms.Label();
             this.runButton = new System.Windows.Forms.Button();
             this.keySizeBox = new System.Windows.Forms.NumericUpDown();
-            this.rangeLabel = new System.Windows.Forms.Label();
             this.testButton = new System.Windows.Forms.Button();
             this.tabPanel = new System.Windows.Forms.TabControl();
             this.sizeDiffTab = new System.Windows.Forms.TabPage();
@@ -76,7 +75,7 @@
             // runButton
             // 
             this.runButton.Location = new System.Drawing.Point(10, 28);
-            this.runButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.runButton.Margin = new System.Windows.Forms.Padding(2);
             this.runButton.Name = "runButton";
             this.runButton.Size = new System.Drawing.Size(112, 19);
             this.runButton.TabIndex = 3;
@@ -92,7 +91,7 @@
             0,
             0});
             this.keySizeBox.Location = new System.Drawing.Point(83, 9);
-            this.keySizeBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.keySizeBox.Margin = new System.Windows.Forms.Padding(2);
             this.keySizeBox.Maximum = new decimal(new int[] {
             16384,
             0,
@@ -112,22 +111,11 @@
             0,
             0});
             // 
-            // rangeLabel
-            // 
-            this.rangeLabel.AutoSize = true;
-            this.rangeLabel.Location = new System.Drawing.Point(9, 360);
-            this.rangeLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.rangeLabel.Name = "rangeLabel";
-            this.rangeLabel.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.rangeLabel.Size = new System.Drawing.Size(88, 13);
-            this.rangeLabel.TabIndex = 7;
-            this.rangeLabel.Text = "Average Range: ";
-            this.rangeLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
             // testButton
             // 
+            this.testButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.testButton.Location = new System.Drawing.Point(459, 9);
-            this.testButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.testButton.Margin = new System.Windows.Forms.Padding(2);
             this.testButton.Name = "testButton";
             this.testButton.Size = new System.Drawing.Size(56, 19);
             this.testButton.TabIndex = 8;
@@ -137,6 +125,9 @@
             // 
             // tabPanel
             // 
+            this.tabPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tabPanel.Controls.Add(this.sizeDiffTab);
             this.tabPanel.Controls.Add(this.distanceTab);
             this.tabPanel.Location = new System.Drawing.Point(12, 52);
@@ -150,7 +141,7 @@
             this.sizeDiffTab.Controls.Add(this.dataChart);
             this.sizeDiffTab.Location = new System.Drawing.Point(4, 22);
             this.sizeDiffTab.Name = "sizeDiffTab";
-            this.sizeDiffTab.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.sizeDiffTab.Padding = new System.Windows.Forms.Padding(3);
             this.sizeDiffTab.Size = new System.Drawing.Size(492, 279);
             this.sizeDiffTab.TabIndex = 0;
             this.sizeDiffTab.Text = "Size";
@@ -165,10 +156,11 @@
             chartArea1.AxisY2.IsMarginVisible = false;
             chartArea1.Name = "ChartArea1";
             this.dataChart.ChartAreas.Add(chartArea1);
+            this.dataChart.Dock = System.Windows.Forms.DockStyle.Fill;
             legend1.Name = "Legend1";
             this.dataChart.Legends.Add(legend1);
-            this.dataChart.Location = new System.Drawing.Point(5, 5);
-            this.dataChart.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.dataChart.Location = new System.Drawing.Point(3, 3);
+            this.dataChart.Margin = new System.Windows.Forms.Padding(2);
             this.dataChart.Name = "dataChart";
             this.dataChart.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
             series1.ChartArea = "ChartArea1";
@@ -176,7 +168,7 @@
             series1.Legend = "Legend1";
             series1.Name = "Series1";
             this.dataChart.Series.Add(series1);
-            this.dataChart.Size = new System.Drawing.Size(482, 269);
+            this.dataChart.Size = new System.Drawing.Size(486, 273);
             this.dataChart.TabIndex = 7;
             this.dataChart.Text = "dataChart";
             // 
@@ -185,7 +177,7 @@
             this.distanceTab.Controls.Add(this.distanceChart);
             this.distanceTab.Location = new System.Drawing.Point(4, 22);
             this.distanceTab.Name = "distanceTab";
-            this.distanceTab.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.distanceTab.Padding = new System.Windows.Forms.Padding(3);
             this.distanceTab.Size = new System.Drawing.Size(492, 279);
             this.distanceTab.TabIndex = 1;
             this.distanceTab.Text = "Distance";
@@ -193,15 +185,20 @@
             // 
             // distanceChart
             // 
-            chartArea2.AxisX.Title = "Modulus & Totient Size (Bits)";
-            chartArea2.AxisY.Title = "Midpoint Distance 10^55";
+            chartArea2.AxisX.Title = "Size (bits)";
+            chartArea2.AxisY.MajorTickMark.Interval = 0D;
+            chartArea2.AxisY.MajorTickMark.IntervalOffset = 0D;
+            chartArea2.AxisY.MajorTickMark.IntervalOffsetType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
+            chartArea2.AxisY.MajorTickMark.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
+            chartArea2.AxisY.Title = "Totient / N";
             chartArea2.AxisY2.IsMarginVisible = false;
             chartArea2.Name = "ChartArea1";
             this.distanceChart.ChartAreas.Add(chartArea2);
+            this.distanceChart.Dock = System.Windows.Forms.DockStyle.Fill;
             legend2.Name = "Legend1";
             this.distanceChart.Legends.Add(legend2);
-            this.distanceChart.Location = new System.Drawing.Point(2, 5);
-            this.distanceChart.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.distanceChart.Location = new System.Drawing.Point(3, 3);
+            this.distanceChart.Margin = new System.Windows.Forms.Padding(2);
             this.distanceChart.Name = "distanceChart";
             this.distanceChart.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
             series2.ChartArea = "ChartArea1";
@@ -209,7 +206,7 @@
             series2.Legend = "Legend1";
             series2.Name = "Series1";
             this.distanceChart.Series.Add(series2);
-            this.distanceChart.Size = new System.Drawing.Size(482, 269);
+            this.distanceChart.Size = new System.Drawing.Size(486, 273);
             this.distanceChart.TabIndex = 8;
             this.distanceChart.Text = "distanceChart";
             // 
@@ -217,15 +214,15 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(524, 381);
             this.Controls.Add(this.tabPanel);
             this.Controls.Add(this.testButton);
-            this.Controls.Add(this.rangeLabel);
             this.Controls.Add(this.keySizeBox);
             this.Controls.Add(this.runButton);
             this.Controls.Add(this.keyWarningLabel);
             this.Controls.Add(this.keySizeLabel);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "KeyGenForm";
             this.Text = "KeyGenForm";
             ((System.ComponentModel.ISupportInitialize)(this.keySizeBox)).EndInit();
@@ -245,7 +242,6 @@
         private System.Windows.Forms.Label keyWarningLabel;
         private System.Windows.Forms.Button runButton;
         private System.Windows.Forms.NumericUpDown keySizeBox;
-        private System.Windows.Forms.Label rangeLabel;
         private System.Windows.Forms.Button testButton;
         private System.Windows.Forms.TabControl tabPanel;
         private System.Windows.Forms.TabPage sizeDiffTab;

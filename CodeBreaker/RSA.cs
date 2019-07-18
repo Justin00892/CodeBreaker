@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Security.Cryptography;
-using System.Numerics;
+using Extreme.Mathematics;
 
 namespace CodeBreaker
 {
@@ -13,7 +13,7 @@ namespace CodeBreaker
             Console.WriteLine(input.ToByteArray().Length);
             Console.WriteLine(publicKey.Value.ToByteArray().Length);
 
-            var outputInt = BigInteger.ModPow(input, publicKey.Value, n.Value);
+            var outputInt = BigInteger.ModularPow(input, publicKey.Value, n.Value);
             return outputInt;
         }
 
@@ -21,7 +21,7 @@ namespace CodeBreaker
         {
             if (privateKey == null || n == null) return input;
 
-            var outputInt = BigInteger.ModPow(input, privateKey.Value, n.Value);
+            var outputInt = BigInteger.ModularPow(input, privateKey.Value, n.Value);
             return outputInt;
         }
 
@@ -58,10 +58,10 @@ namespace CodeBreaker
             if (debug)
             {
                 var test = new BigInteger(1234);
-                var testOut = BigInteger.ModPow(test, e, n);
+                var testOut = BigInteger.ModularPow(test, e, n);
                 Console.WriteLine(test);
                 Console.WriteLine(testOut);
-                Console.WriteLine(BigInteger.ModPow(testOut, d, n));
+                Console.WriteLine(BigInteger.ModularPow(testOut, d, n));
             }
             
 

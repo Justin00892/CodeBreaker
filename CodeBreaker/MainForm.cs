@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
-using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Extreme.Mathematics;
 
 namespace CodeBreaker
 {

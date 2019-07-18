@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-using System.Numerics;
+using CodeBreaker.Models;
+using Extreme.Mathematics;
 
 namespace CodeBreaker
 {
@@ -30,7 +30,7 @@ namespace CodeBreaker
             {
                 keyWarningLabel.Text = "";
                 _size = (int)enteredSize;
-                _data = await Task<Stats>.Factory.StartNew(() => Crypto.CompareNWithTotient(_size,1,false));
+                _data = await Task<Stats>.Factory.StartNew(() => Crypto.CompareNWithTotient(_data,_size,100,false));
                 MakeGraph(_data);
             }
 
@@ -44,8 +44,6 @@ namespace CodeBreaker
 
             foreach (var xy in data.Points)
                 series.Points.AddXY(xy.X,xy.Y);
-
-            rangeLabel.Text = "s = " + Math.Round(data.StandardDeviation(), 3);
 
             var yMin = dataChart.ChartAreas[0].AxisY.Minimum;
             var yMax = dataChart.ChartAreas[0].AxisY.Maximum;
@@ -69,14 +67,11 @@ namespace CodeBreaker
 
             dataChart.Refresh();
 
-            var distanceSeries = distanceChart.Series.FindByName("Data") ?? distanceChart.Series.Add("Data");
-            distanceSeries.ChartType = SeriesChartType.Point;
+            var nSeries = distanceChart.Series.FindByName("Data") ?? distanceChart.Series.Add("Data");
+            nSeries.ChartType = SeriesChartType.Point;
 
             foreach (var xy in data.Points)
-            {
-                
-            }
-
+                nSeries.Points.AddXY(xy.X, double.Parse(xy.Ratio.ToString()));
 
             distanceChart.Refresh();
         }

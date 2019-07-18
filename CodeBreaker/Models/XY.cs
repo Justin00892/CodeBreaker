@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+﻿using Extreme.Mathematics;
 
 namespace CodeBreaker.Models
 {
@@ -11,10 +11,7 @@ namespace CodeBreaker.Models
         public BigInteger Q { get; }
         public BigInteger N { get; }
         public BigInteger Totient { get; }
-        public double nDouble { get; set; }
-        public int nMagnitude { get; set; }
-        public double totDouble { get; set; }
-        public int totMagnitude { get; set; }
+        public BigFloat Ratio { get; set; }
 
         public XY(BigInteger p, BigInteger q, BigInteger n, BigInteger totient, int x,int y)
         {

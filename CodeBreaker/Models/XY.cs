@@ -12,7 +12,7 @@ namespace CodeBreaker.Models
         public BigInteger N { get; }
         public BigInteger Totient { get; }
         public BigFloat Ratio { get; set; }
-
+        public double Diff { get; set; }
         public XY(BigInteger p, BigInteger q, BigInteger n, BigInteger totient, int x,int y)
         {
             X = x;

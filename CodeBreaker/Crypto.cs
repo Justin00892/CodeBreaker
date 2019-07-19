@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
@@ -75,9 +77,10 @@ namespace CodeBreaker
             var test0 = 0;
             var test1 = 0;
             var recounts = 0;
+            var magnitudes = new List<double>();
             foreach (var xy in data.Points)
             {
-                var expectedSigDigits = (int)Math.Round((data.SizeIntercept + data.SizeSlope * xy.X)-3);
+                var expectedSigDigits = (int)Math.Round((data.SizeIntercept + data.SizeSlope * xy.X)-2.25);
                 BigInteger n, tot;
                 string maxString, totString;
                 var count = 0;
@@ -94,13 +97,23 @@ namespace CodeBreaker
                 if (count > 1) recounts++;
 
                 xy.Ratio = BigFloat.Divide(tot,n);
+                xy.Diff = double.Parse(BigInteger.Subtract(n, tot).ToString());
+                var diffSplit = xy.Diff.ToString(CultureInfo.InvariantCulture).Split('E');
+                var diffMag = double.Parse(diffSplit[1]);
+                magnitudes.Add(xy.X / diffMag);
                 var differences = new List<int>();
+                Console.WriteLine("  N: "+n);
+                Console.WriteLine("Tot: "+tot);
+                Console.WriteLine("Size: " + xy.X);
+                Console.WriteLine("Diff: " + xy.Diff);
+                Console.WriteLine("Size / Diff Mag: " + xy.X / diffMag);
+
                 for (var i = 0; i < maxString.Length; i++)
                 {
                     var nDigit = int.Parse(maxString[i].ToString());
                     var totDigit = int.Parse(totString[i].ToString());
                     var diff = Math.Abs(nDigit - totDigit);
-                    Console.Write(diff+", ");
+                    //Console.Write(diff+", ");
                     differences.Add(diff);
                     //Console.WriteLine("N["+i+"]: " + nDigit);
                     //Console.WriteLine("Totient["+i+"]: " + totDigit);
@@ -123,6 +136,7 @@ namespace CodeBreaker
             Console.WriteLine("Are <= 5: " + test0 + "/" + are0);
             Console.WriteLine("Are 1: " + are1 + "/" + data.Points.Count);
             Console.WriteLine("Are >= 5: " + test1 + "/" + are1);
+            Console.WriteLine("Average key size / differance magnitude: " + magnitudes.Average());
             data.Points.RemoveAll(p => p.Ratio > 1);
 
             if (!debug) return data;
@@ -162,12 +176,13 @@ namespace CodeBreaker
         public static BigInteger GuessTotient(Stats data, BigInteger n, int keySize, BigInteger e, BigInteger realTotient)
         {
             var totient = BigInteger.MinusOne;
-            var expectedSigDigits =(int)(data.SizeIntercept + data.SizeSlope * keySize);
+            var expectedSigDigits = (int)Math.Round((data.SizeIntercept + data.SizeSlope * keySize) - 2.25);
 
             var baseNString = n.ToString().Substring(0,expectedSigDigits);
             var maxString = n.ToString().Substring(expectedSigDigits);
             var max = BigInteger.Parse(maxString);
             var min = (BigInteger)BigFloat.Round(BigFloat.Multiply(new BigFloat(max), data.AverageRatio));
+            var maxDigit = int.Parse(maxString[0]+"");
 
             //Remove after testing
             var temp = expectedSigDigits;
@@ -185,7 +200,6 @@ namespace CodeBreaker
             Console.WriteLine("Ratio: " + totDouble / nDouble);
             var target = BigInteger.Parse(realTotient.ToString().Substring(expectedSigDigits));
             Console.WriteLine(min <= target && target <= max);
-
 
             Parallel.ForEach(BigIntSequenceReverse(min, BigInteger.Subtract(max,BigInteger.One)), (i, state) =>
             {

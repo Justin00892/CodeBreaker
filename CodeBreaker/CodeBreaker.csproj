@@ -40,7 +40,10 @@
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Extreme.Numerics, Version=7.0.7.0, Culture=neutral, PublicKeyToken=9e513770f58567b2, processorArchitecture=MSIL">
-      <HintPath>..\packages\Extreme.Numerics.7.0.7\lib\net46\Extreme.Numerics.dll</HintPath>
+      <HintPath>..\packages\Extreme.Numerics.7.0.8\lib\net46\Extreme.Numerics.dll</HintPath>
+    </Reference>
+    <Reference Include="MathNet.Numerics, Version=4.8.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.4.8.1\lib\net461\MathNet.Numerics.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.EntityFrameworkCore, Version=2.2.6.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.EntityFrameworkCore.2.2.6\lib\netstandard2.0\Microsoft.EntityFrameworkCore.dll</HintPath>

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
@@ -71,84 +69,44 @@ namespace CodeBreaker
                         data.Points.Add(xy);
                 }
             }
-            data.LinearRegressionSize();
-            var are0 = 0;
-            var are1 = 0;
-            var test0 = 0;
-            var test1 = 0;
-            var recounts = 0;
-            var magnitudes = new List<double>();
+            data.LinearRegression();
+            var diffs = new List<List<int>>();
             foreach (var xy in data.Points)
             {
-                var expectedSigDigits = (int)Math.Round((data.SizeIntercept + data.SizeSlope * xy.X)-2.25);
-                BigInteger n, tot;
-                string maxString, totString;
-                var count = 0;
-                do
-                {
-                    maxString = xy.N.ToString().Substring(expectedSigDigits);
-                    n = BigInteger.Parse(maxString);
-                    totString = xy.Totient.ToString().Substring(expectedSigDigits);
-                    tot = BigInteger.Parse(totString);
-                    expectedSigDigits--;
-                    count++;
-                } while (BigInteger.Compare(n, tot) < 0);
+                var expectedSigDigits = (int)Math.Round(data.Intercept + data.Slope * xy.X);
+                var maxString = xy.N.ToString().Substring(xy.Y);
+                var totString = xy.Totient.ToString().Substring(xy.Y);
 
-                if (count > 1) recounts++;
-
-                xy.Ratio = BigFloat.Divide(tot,n);
-                xy.Diff = double.Parse(BigInteger.Subtract(n, tot).ToString());
-                var diffSplit = xy.Diff.ToString(CultureInfo.InvariantCulture).Split('E');
-                var diffMag = double.Parse(diffSplit[1]);
-                magnitudes.Add(xy.X / diffMag);
-                var differences = new List<int>();
-                Console.WriteLine("  N: "+n);
-                Console.WriteLine("Tot: "+tot);
-                Console.WriteLine("Size: " + xy.X);
-                Console.WriteLine("Diff: " + xy.Diff);
-                Console.WriteLine("Size / Diff Mag: " + xy.X / diffMag);
-
+                var diff = new List<int>();
                 for (var i = 0; i < maxString.Length; i++)
                 {
-                    var nDigit = int.Parse(maxString[i].ToString());
-                    var totDigit = int.Parse(totString[i].ToString());
-                    var diff = Math.Abs(nDigit - totDigit);
-                    //Console.Write(diff+", ");
-                    differences.Add(diff);
-                    //Console.WriteLine("N["+i+"]: " + nDigit);
-                    //Console.WriteLine("Totient["+i+"]: " + totDigit);
+                    var nDigit = int.Parse(maxString[i] + "");
+                    var totDigit = int.Parse(totString[i] + "");
+                    diff.Add(Math.Abs(nDigit-totDigit));
                 }
-                Console.WriteLine();
+                diffs.Add(diff);
 
-                if (differences[0] == 0)
-                {
-                    are0++;
-                    if (differences[1] <= 5) test0++;
-                }
-                else if (differences[0] == 1)
-                {
-                    are1++;
-                    if (differences[1] >= 5) test1++;
-                }
+                if (!debug) continue;
+                Console.WriteLine("\n  N: " + maxString);
+                Console.WriteLine("Tot: " + totString);
+                Console.WriteLine("Predicted Shared Digits: " + expectedSigDigits);
+                Console.WriteLine("Actual Shared Digits: " + xy.Y);
+                Console.WriteLine("Size: " + xy.X);
+                Console.WriteLine("Diff: " + xy.Diff);
             }
-            Console.WriteLine("Recounts: " + recounts);
-            Console.WriteLine("Are 0: " + are0 + "/" + data.Points.Count);
-            Console.WriteLine("Are <= 5: " + test0 + "/" + are0);
-            Console.WriteLine("Are 1: " + are1 + "/" + data.Points.Count);
-            Console.WriteLine("Are >= 5: " + test1 + "/" + are1);
-            Console.WriteLine("Average key size / differance magnitude: " + magnitudes.Average());
-            data.Points.RemoveAll(p => p.Ratio > 1);
 
-            if (!debug) return data;
-
-            foreach (var xy in data.Points)
+            if (debug)
             {
-                Console.WriteLine("\nP:\n"+xy.P);
-                Console.WriteLine("Q:\n"+xy.Q);
-                Console.WriteLine("N:\n"+xy.N);
-                Console.WriteLine("Totient:\n"+xy.Totient);
-                Console.WriteLine("Ratio: " + xy.Ratio);
+                Console.WriteLine("\nFirst Digit Diffs:");
+                for (var i = 0; i < 10; i++)
+                    Console.WriteLine(i + ": " + diffs.Count(d => d[0] == i));
+                Console.WriteLine("First Digit Diff < 4: Second Digit Diffs:");
+                for (var i = 0; i < 10; i++)
+                    Console.WriteLine(i + ": " + diffs.Count(d => d[0] < 4 && d[1] == i));
+
             }
+            
+            data.Points.RemoveAll(p => p.Ratio > 1);
             return data;
         }
 
@@ -176,35 +134,34 @@ namespace CodeBreaker
         public static BigInteger GuessTotient(Stats data, BigInteger n, int keySize, BigInteger e, BigInteger realTotient)
         {
             var totient = BigInteger.MinusOne;
-            var expectedSigDigits = (int)Math.Round((data.SizeIntercept + data.SizeSlope * keySize) - 2.25);
+            var expectedSigDigits = (int)Math.Round((data.Intercept + data.Slope * keySize)-3.5);
 
             var baseNString = n.ToString().Substring(0,expectedSigDigits);
             var maxString = n.ToString().Substring(expectedSigDigits);
             var max = BigInteger.Parse(maxString);
             var min = (BigInteger)BigFloat.Round(BigFloat.Multiply(new BigFloat(max), data.AverageRatio));
-            var maxDigit = int.Parse(maxString[0]+"");
 
             //Remove after testing
-            var temp = expectedSigDigits;
-            BigInteger tempN, tempTot;
-            do
-            {
-                var str = n.ToString().Substring(temp);
-                tempN = BigInteger.Parse(str);
-                var totString = realTotient.ToString().Substring(temp);
-                tempTot = BigInteger.Parse(totString);
-                temp--;
-            } while (BigInteger.Compare(tempN, tempTot) < 0);
-            var nDouble = double.Parse(tempN.ToString());
-            var totDouble = double.Parse(tempTot.ToString());
-            Console.WriteLine("Ratio: " + totDouble / nDouble);
-            var target = BigInteger.Parse(realTotient.ToString().Substring(expectedSigDigits));
-            Console.WriteLine(min <= target && target <= max);
+            var nStr = n.ToString();
+            var totStr = realTotient.ToString();
+            var actualShared = 0;
+            for (; actualShared < n.ToString().Length; actualShared++) if (nStr[actualShared] != totStr[actualShared]) break;
+            var target = BigInteger.Parse(realTotient.ToString().Substring(actualShared));
 
-            Parallel.ForEach(BigIntSequenceReverse(min, BigInteger.Subtract(max,BigInteger.One)), (i, state) =>
+            Console.WriteLine("\n      N: " + nStr.Substring(actualShared));
+            Console.WriteLine("Totient: " + totStr.Substring(actualShared));
+            Console.WriteLine("Predicted Shared: "+expectedSigDigits);
+            Console.WriteLine("Actual Shared: "+actualShared);
+
+            var mag = (int) Math.Round((keySize / data.DiffFactor)+3.5);
+            Console.WriteLine("Diff: " + double.Parse(BigInteger.Subtract(max,target).ToString()));
+            Console.WriteLine("Estimated Diff Magnitude: " + mag);
+
+            max = BigInteger.Subtract(max, BigInteger.One);
+
+            Parallel.ForEach(BigIntSequenceReverse(min, max), (i, state) =>
             {
-                //Console.WriteLine("mid to max: "+i);
-                if (BigInteger.Compare(i, target) != 0) return;
+                if (BigInteger.Compare(i,target) != 0) return;
                 totient = i;
                 state.Break();
             });

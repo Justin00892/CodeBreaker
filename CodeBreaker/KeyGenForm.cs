@@ -11,7 +11,7 @@ namespace CodeBreaker
 {
     public partial class KeyGenForm : Form
     {
-        private int _size = 384;
+        private int _size = 512;
         private Stats _data;
         public KeyGenForm()
         {
@@ -30,7 +30,7 @@ namespace CodeBreaker
             {
                 keyWarningLabel.Text = "";
                 _size = (int)enteredSize;
-                _data = await Task<Stats>.Factory.StartNew(() => Crypto.CompareNWithTotient(_data,_size,100,false));
+                _data = await Task<Stats>.Factory.StartNew(() => Crypto.CompareNWithTotient(_data,_size,100,true));
                 MakeGraph(_data);
             }
 
@@ -60,8 +60,8 @@ namespace CodeBreaker
 
             var xMin = series.Points.FindMinByValue("X")?.XValue ?? 0;
             var xMax = series.Points.FindMaxByValue("X")?.XValue ?? 1;
-            var minPoint = data.SizeIntercept + data.SizeSlope * xMin;
-            var maxPoint = data.SizeIntercept + data.SizeSlope * xMax;
+            var minPoint = data.Intercept + data.Slope * xMin;
+            var maxPoint = data.Intercept + data.Slope * xMax;
             regressionLine.Points.AddXY(xMin, minPoint);
             regressionLine.Points.AddXY(xMax, maxPoint);
 
@@ -71,7 +71,7 @@ namespace CodeBreaker
             nSeries.ChartType = SeriesChartType.Point;
 
             foreach (var xy in data.Points)
-                nSeries.Points.AddXY(xy.X, double.Parse(xy.Ratio.ToString()));
+                nSeries.Points.AddXY(xy.X, xy.Diff);
 
             distanceChart.Refresh();
         }

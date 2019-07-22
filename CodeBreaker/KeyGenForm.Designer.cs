@@ -39,17 +39,17 @@
             this.runButton = new System.Windows.Forms.Button();
             this.keySizeBox = new System.Windows.Forms.NumericUpDown();
             this.testButton = new System.Windows.Forms.Button();
-            this.tabPanel = new System.Windows.Forms.TabControl();
-            this.sizeDiffTab = new System.Windows.Forms.TabPage();
-            this.dataChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.distanceTab = new System.Windows.Forms.TabPage();
             this.distanceChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.sizeDiffTab = new System.Windows.Forms.TabPage();
+            this.dataChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.tabPanel = new System.Windows.Forms.TabControl();
             ((System.ComponentModel.ISupportInitialize)(this.keySizeBox)).BeginInit();
-            this.tabPanel.SuspendLayout();
-            this.sizeDiffTab.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataChart)).BeginInit();
             this.distanceTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.distanceChart)).BeginInit();
+            this.sizeDiffTab.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataChart)).BeginInit();
+            this.tabPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // keySizeLabel
@@ -123,18 +123,44 @@
             this.testButton.UseVisualStyleBackColor = true;
             this.testButton.Click += new System.EventHandler(this.TestButton_Click);
             // 
-            // tabPanel
+            // distanceTab
             // 
-            this.tabPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tabPanel.Controls.Add(this.sizeDiffTab);
-            this.tabPanel.Controls.Add(this.distanceTab);
-            this.tabPanel.Location = new System.Drawing.Point(12, 52);
-            this.tabPanel.Name = "tabPanel";
-            this.tabPanel.SelectedIndex = 0;
-            this.tabPanel.Size = new System.Drawing.Size(500, 305);
-            this.tabPanel.TabIndex = 9;
+            this.distanceTab.Controls.Add(this.distanceChart);
+            this.distanceTab.Location = new System.Drawing.Point(4, 22);
+            this.distanceTab.Name = "distanceTab";
+            this.distanceTab.Padding = new System.Windows.Forms.Padding(3);
+            this.distanceTab.Size = new System.Drawing.Size(492, 279);
+            this.distanceTab.TabIndex = 1;
+            this.distanceTab.Text = "Differance";
+            this.distanceTab.UseVisualStyleBackColor = true;
+            // 
+            // distanceChart
+            // 
+            chartArea1.AxisX.Title = "Size (bits)";
+            chartArea1.AxisY.IsLogarithmic = true;
+            chartArea1.AxisY.MajorTickMark.Interval = 0D;
+            chartArea1.AxisY.MajorTickMark.IntervalOffset = 0D;
+            chartArea1.AxisY.MajorTickMark.IntervalOffsetType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
+            chartArea1.AxisY.MajorTickMark.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
+            chartArea1.AxisY.Title = "N Minus Totient";
+            chartArea1.AxisY2.IsMarginVisible = false;
+            chartArea1.Name = "ChartArea1";
+            this.distanceChart.ChartAreas.Add(chartArea1);
+            this.distanceChart.Dock = System.Windows.Forms.DockStyle.Fill;
+            legend1.Name = "Legend1";
+            this.distanceChart.Legends.Add(legend1);
+            this.distanceChart.Location = new System.Drawing.Point(3, 3);
+            this.distanceChart.Margin = new System.Windows.Forms.Padding(2);
+            this.distanceChart.Name = "distanceChart";
+            this.distanceChart.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.distanceChart.Series.Add(series1);
+            this.distanceChart.Size = new System.Drawing.Size(486, 273);
+            this.distanceChart.TabIndex = 8;
+            this.distanceChart.Text = "distanceChart";
             // 
             // sizeDiffTab
             // 
@@ -149,66 +175,41 @@
             // 
             // dataChart
             // 
-            chartArea1.AxisX.Title = "Modulus & Totient Size (bits)";
-            chartArea1.AxisY.Maximum = 100D;
-            chartArea1.AxisY.Minimum = 0D;
-            chartArea1.AxisY.Title = "Common Significant Digits";
-            chartArea1.AxisY2.IsMarginVisible = false;
-            chartArea1.Name = "ChartArea1";
-            this.dataChart.ChartAreas.Add(chartArea1);
+            chartArea2.AxisX.Title = "Modulus & Totient Size (bits)";
+            chartArea2.AxisY.Maximum = 100D;
+            chartArea2.AxisY.Minimum = 0D;
+            chartArea2.AxisY.Title = "Common Significant Digits";
+            chartArea2.AxisY2.IsMarginVisible = false;
+            chartArea2.Name = "ChartArea1";
+            this.dataChart.ChartAreas.Add(chartArea2);
             this.dataChart.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend1.Name = "Legend1";
-            this.dataChart.Legends.Add(legend1);
+            legend2.Name = "Legend1";
+            this.dataChart.Legends.Add(legend2);
             this.dataChart.Location = new System.Drawing.Point(3, 3);
             this.dataChart.Margin = new System.Windows.Forms.Padding(2);
             this.dataChart.Name = "dataChart";
             this.dataChart.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.dataChart.Series.Add(series1);
-            this.dataChart.Size = new System.Drawing.Size(486, 273);
-            this.dataChart.TabIndex = 7;
-            this.dataChart.Text = "dataChart";
-            // 
-            // distanceTab
-            // 
-            this.distanceTab.Controls.Add(this.distanceChart);
-            this.distanceTab.Location = new System.Drawing.Point(4, 22);
-            this.distanceTab.Name = "distanceTab";
-            this.distanceTab.Padding = new System.Windows.Forms.Padding(3);
-            this.distanceTab.Size = new System.Drawing.Size(492, 279);
-            this.distanceTab.TabIndex = 1;
-            this.distanceTab.Text = "Distance";
-            this.distanceTab.UseVisualStyleBackColor = true;
-            // 
-            // distanceChart
-            // 
-            chartArea2.AxisX.Title = "Size (bits)";
-            chartArea2.AxisY.MajorTickMark.Interval = 0D;
-            chartArea2.AxisY.MajorTickMark.IntervalOffset = 0D;
-            chartArea2.AxisY.MajorTickMark.IntervalOffsetType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
-            chartArea2.AxisY.MajorTickMark.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
-            chartArea2.AxisY.Title = "Totient / N";
-            chartArea2.AxisY2.IsMarginVisible = false;
-            chartArea2.Name = "ChartArea1";
-            this.distanceChart.ChartAreas.Add(chartArea2);
-            this.distanceChart.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend2.Name = "Legend1";
-            this.distanceChart.Legends.Add(legend2);
-            this.distanceChart.Location = new System.Drawing.Point(3, 3);
-            this.distanceChart.Margin = new System.Windows.Forms.Padding(2);
-            this.distanceChart.Name = "distanceChart";
-            this.distanceChart.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
             series2.ChartArea = "ChartArea1";
             series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
             series2.Legend = "Legend1";
             series2.Name = "Series1";
-            this.distanceChart.Series.Add(series2);
-            this.distanceChart.Size = new System.Drawing.Size(486, 273);
-            this.distanceChart.TabIndex = 8;
-            this.distanceChart.Text = "distanceChart";
+            this.dataChart.Series.Add(series2);
+            this.dataChart.Size = new System.Drawing.Size(486, 273);
+            this.dataChart.TabIndex = 7;
+            this.dataChart.Text = "dataChart";
+            // 
+            // tabPanel
+            // 
+            this.tabPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabPanel.Controls.Add(this.sizeDiffTab);
+            this.tabPanel.Controls.Add(this.distanceTab);
+            this.tabPanel.Location = new System.Drawing.Point(12, 52);
+            this.tabPanel.Name = "tabPanel";
+            this.tabPanel.SelectedIndex = 0;
+            this.tabPanel.Size = new System.Drawing.Size(500, 305);
+            this.tabPanel.TabIndex = 9;
             // 
             // KeyGenForm
             // 
@@ -226,11 +227,11 @@
             this.Name = "KeyGenForm";
             this.Text = "KeyGenForm";
             ((System.ComponentModel.ISupportInitialize)(this.keySizeBox)).EndInit();
-            this.tabPanel.ResumeLayout(false);
-            this.sizeDiffTab.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataChart)).EndInit();
             this.distanceTab.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.distanceChart)).EndInit();
+            this.sizeDiffTab.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataChart)).EndInit();
+            this.tabPanel.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -243,10 +244,10 @@
         private System.Windows.Forms.Button runButton;
         private System.Windows.Forms.NumericUpDown keySizeBox;
         private System.Windows.Forms.Button testButton;
-        private System.Windows.Forms.TabControl tabPanel;
-        private System.Windows.Forms.TabPage sizeDiffTab;
-        private System.Windows.Forms.DataVisualization.Charting.Chart dataChart;
         private System.Windows.Forms.TabPage distanceTab;
         private System.Windows.Forms.DataVisualization.Charting.Chart distanceChart;
+        private System.Windows.Forms.TabPage sizeDiffTab;
+        private System.Windows.Forms.DataVisualization.Charting.Chart dataChart;
+        private System.Windows.Forms.TabControl tabPanel;
     }
 }

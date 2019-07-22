@@ -1,4 +1,6 @@
-﻿using Extreme.Mathematics;
+﻿using System;
+using System.Globalization;
+using Extreme.Mathematics;
 
 namespace CodeBreaker.Models
 {
@@ -11,8 +13,8 @@ namespace CodeBreaker.Models
         public BigInteger Q { get; }
         public BigInteger N { get; }
         public BigInteger Totient { get; }
-        public BigFloat Ratio { get; set; }
-        public double Diff { get; set; }
+        public BigFloat Ratio { get; }
+        public double Diff { get; }
         public XY(BigInteger p, BigInteger q, BigInteger n, BigInteger totient, int x,int y)
         {
             X = x;
@@ -21,6 +23,14 @@ namespace CodeBreaker.Models
             P = p;
             Q = q;
             Totient = totient;
+            Ratio = BigFloat.Divide(Totient, N);
+            Diff = double.Parse(BigInteger.Subtract(N, Totient).ToString());
+        }
+
+        public Tuple<double, int> GetDiffTuple()
+        {
+            var diffSplit = Diff.ToString(CultureInfo.InvariantCulture).Split('E');
+            return new Tuple<double, int>(double.Parse(diffSplit[0]), int.Parse(diffSplit[1]));
         }
     }
 }

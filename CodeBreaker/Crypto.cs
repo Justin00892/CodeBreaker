@@ -93,25 +93,30 @@ namespace CodeBreaker
                     }
                     diffs.Add(diff);
 
-                    Console.WriteLine("Size: " + xy.X);
-                    Console.WriteLine("\n  N: " + maxString);
-                    Console.WriteLine("Tot: " + totString);
+                    Console.WriteLine("\nKey Size: " + xy.X);
+                    Console.WriteLine("Full: ");
+                    Console.WriteLine("      N: " + xy.N);
+                    Console.WriteLine("Totient: " + xy.Totient);
                     Console.WriteLine("Predicted Shared Digits: " + expectedSigDigits);
                     Console.WriteLine("Actual Shared Digits: " + xy.Y);
+                    Console.WriteLine("Dynamic Portion: ");
+                    Console.WriteLine("  N: " + maxString);
+                    Console.WriteLine("Tot: " + totString);
                     Console.WriteLine("Estimated Diff Magnitude: " + mag);
                     if (Math.Abs(mag - xy.Y) <= 1) diffMagCount++;
                     if (Math.Abs(expectedSigDigits - xy.Y) <= 1) sharedCount++;
                     Console.WriteLine("Diff: " + xy.Diff);
                 }
-                Console.WriteLine("\nFirst Digit Diffs:");
+                Console.WriteLine("\nSample Size: " + data.Points.Count);
+                Console.WriteLine("First Digit Diffs:");
                 for (var i = 0; i < 10; i++)
                     Console.WriteLine(i + ": " + diffs.Count(d => d[0] == i));
                 Console.WriteLine("First Digit Diff < 4: Second Digit Diffs:");
                 for (var i = 0; i < 10; i++)
                     Console.WriteLine(i + ": " + diffs.Count(d => d[0] < 4 && d[1] == i));
 
-                Console.WriteLine("Times Predicted Diff Mag = Actual Shared Digits +- 1: " + diffMagCount + "/" + data.Points.Count);
-                Console.WriteLine("Times PredictedSharedDigits = Actual Shared Digits +- 1: " + sharedCount + "/" + data.Points.Count);
+                //Console.WriteLine("Times Predicted Diff Mag = Actual Shared Digits +- 1: " + diffMagCount + "/" + data.Points.Count);
+                //Console.WriteLine("Times PredictedSharedDigits = Actual Shared Digits +- 1: " + sharedCount + "/" + data.Points.Count);
             }
 
             data.Points.RemoveAll(p => p.Ratio > 1);

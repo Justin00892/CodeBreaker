@@ -36,10 +36,10 @@ namespace CodeBreaker.Models
             var xSum = xSquares.Sum();
             var sdX = Math.Sqrt(xSum / (n - 1));
 
-            var xySum = (double)Points.Select(d => d.X * d.Y).Sum();
-            var xSquareSum = (double)Points.Select(d => d.X*d.X).Sum();
-            var ySquareSum = (double)Points.Select(d => d.Y*d.Y).Sum();
-            var r = xySum / Math.Sqrt(xSquareSum * ySquareSum);
+            var xySum = Points.Select(d => d.X * d.Y).Sum();
+            var xSquareSum = Points.Sum(d => BigFloat.Multiply(d.X, d.X));
+            var ySquareSum = Points.Sum(d => BigFloat.Multiply(d.Y, d.Y));
+            var r = double.Parse(BigFloat.Divide(xySum,BigFloat.Sqrt(BigFloat.Multiply(xSquareSum, ySquareSum))).ToString());
             Slope = r * sdY / sdX;
             Intercept = yMean - Slope * xMean;
         }

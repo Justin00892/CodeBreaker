@@ -12,6 +12,7 @@ namespace CodeBreaker
     public partial class KeyGenForm : Form
     {
         private int _size = 512;
+        private int _replicates = 100;
         private Stats _data;
         public KeyGenForm()
         {
@@ -33,7 +34,8 @@ namespace CodeBreaker
             {
                 keyWarningLabel.Text = "";
                 _size = (int)enteredSize;
-                _data = await Task<Stats>.Factory.StartNew(() => Crypto.CompareNWithTotient(_data,384,_size,100,false));
+                _replicates = (int) replicatesBox.Value;
+                _data = await Task<Stats>.Factory.StartNew(() => Crypto.CompareNWithTotient(_data,384,_size,_replicates,false));
                 MakeGraph(_data);
             }
 
@@ -80,6 +82,16 @@ namespace CodeBreaker
 
             distanceChart.Refresh();
 
+            nChart.GetToolTipText += (sender, args) =>
+            {
+                switch (args.HitTestResult.ChartElementType)
+                {
+                    case ChartElementType.DataPoint:
+                        var point = args.HitTestResult.Series.Points[args.HitTestResult.PointIndex];
+                        args.Text = $"N:\t{point.XValue}\nTot:\t{point.YValues[0]}";
+                        break;
+                }
+            };
             for (var i = 384; i <= _size; i += 8)
             {
                 var nSeries = nChart.Series.FindByName("Size: " + i) ?? nChart.Series.Add("Size: " + i);

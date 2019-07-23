@@ -1,27 +1,21 @@
-# Code Libraries and Implementations
-* Using Microsoft .NET library for prime generation
+<h2>Code Libraries and Implementations</h2>
+<ul>
+  <li>Using Microsoft .NET library for prime generation</li>
+  <li>Using Extreme.Mathematics implementation of BigInteger and BigFloat</li>
+  <li>All loops are done in parallel if possible to maximize resource utilization and (hopefully) reduce the amount of time it takes to run</li>
+</ul>
 
-* Using Extreme.Mathematics implementation of BigInteger and BigFloat
-
-* All loops are done in parallel if possible to maximize resource utilization and (hopefully) reduce the amount of time it takes to run
-
-# Base Assumptions
-
-* Key size is between 384 and 16384 bits
-
-* n = p * q with p and q being similarly sized, sufficiently large primes
-
-* n will always be odd (mod 2 = 1)
-
-* ϕ(n) = (p-1) * (q-1)
-
-* ϕ(n) will always be even (mod 2 = 0)
-
-* n > ϕ(n)
-
-* n (and its size) are always known
-
-* p, q, and ϕ(n) are unknown
+<h2>Base Assumptions</h2>
+<ul>
+  <li>Key size is between 384 and 16384 bits</li>
+  <li>n = p * q with p and q being similarly sized, sufficiently large primes</li>
+  <li>n will always be odd (mod 2 = 1)</li>
+  <li>ϕ(n) = (p-1) * (q-1)</li>
+  <li>ϕ(n) will always be even (mod 2 = 0)</li>
+  <li>n > ϕ(n)</li>
+  <li>n (and its size) are always known</li>
+  <li>p, q, and ϕ(n) are unknown</li>
+</ul>
 
 # Discovered Relationships between n and ϕ(n)
 * n and ϕ(n) share roughly half of the same significant digits. From this, n and ϕ(n) can each be broken into two parts, a static part (the base) and a dynamic part. The static parts of each number are equal while the dynamic parts are not.

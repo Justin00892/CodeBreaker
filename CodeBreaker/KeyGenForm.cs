@@ -18,11 +18,14 @@ namespace CodeBreaker
             InitializeComponent();
             dataChart.Series.Clear();
             distanceChart.Series.Clear();
+            nChart.Series.Clear();
         }
 
         private async void RunButton_Click(object sender, EventArgs e)
         {
             runButton.Enabled = false;
+            loadingPanel.BringToFront();
+            loadingPanel.Visible = true;
             var enteredSize = keySizeBox.Value;
             if (enteredSize < 384 || enteredSize > 16384) keyWarningLabel.Text = "Range: 384 - 16384";
             else if (enteredSize % 8 != 0) keyWarningLabel.Text = "Must be increments of 8";
@@ -30,10 +33,12 @@ namespace CodeBreaker
             {
                 keyWarningLabel.Text = "";
                 _size = (int)enteredSize;
-                _data = await Task<Stats>.Factory.StartNew(() => Crypto.CompareNWithTotient(_data,_size,100,true));
+                _data = await Task<Stats>.Factory.StartNew(() => Crypto.CompareNWithTotient(_data,384,_size,100,false));
                 MakeGraph(_data);
             }
 
+            loadingPanel.Visible = false;
+            loadingPanel.SendToBack();
             runButton.Enabled = true;
         }
 
@@ -67,13 +72,24 @@ namespace CodeBreaker
 
             dataChart.Refresh();
 
-            var nSeries = distanceChart.Series.FindByName("Data") ?? distanceChart.Series.Add("Data");
-            nSeries.ChartType = SeriesChartType.Point;
+            var diffSeries = distanceChart.Series.FindByName("Data") ?? distanceChart.Series.Add("Data");
+            diffSeries.ChartType = SeriesChartType.Point;
 
             foreach (var xy in data.Points)
-                nSeries.Points.AddXY(xy.X, xy.Diff);
+                diffSeries.Points.AddXY(xy.X, xy.Diff);
 
             distanceChart.Refresh();
+
+            for (var i = 384; i <= _size; i += 8)
+            {
+                var nSeries = nChart.Series.FindByName("Size: " + i) ?? nChart.Series.Add("Size: " + i);
+                nSeries.ChartType = SeriesChartType.Point;
+
+                foreach (var xy in data.Points.Where(p => p.X == i))
+                    nSeries.Points.AddXY(double.Parse(xy.NDynamic.ToString()), double.Parse(xy.TotDynamic.ToString()));
+            }
+            
+            nChart.Refresh();
         }
 
         private async void TestButton_Click(object sender, EventArgs e)

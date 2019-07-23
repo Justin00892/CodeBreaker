@@ -13,6 +13,8 @@ namespace CodeBreaker.Models
         public BigInteger Q { get; }
         public BigInteger N { get; }
         public BigInteger Totient { get; }
+        public BigInteger NDynamic { get; }
+        public BigInteger TotDynamic { get; }
         public BigFloat Ratio { get; }
         public double Diff { get; }
         public XY(BigInteger p, BigInteger q, BigInteger n, BigInteger totient, int x,int y)
@@ -25,6 +27,8 @@ namespace CodeBreaker.Models
             Totient = totient;
             Ratio = BigFloat.Divide(Totient, N);
             Diff = double.Parse(BigInteger.Subtract(N, Totient).ToString());
+            NDynamic = BigInteger.Parse(N.ToString().Substring(Y));
+            TotDynamic = BigInteger.Parse(Totient.ToString().Substring(Y));
         }
 
         public Tuple<double, int> GetDiffTuple()

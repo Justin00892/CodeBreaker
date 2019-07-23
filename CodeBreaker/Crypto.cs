@@ -42,13 +42,13 @@ namespace CodeBreaker
             return result;
         }
 
-        public static Stats CompareNWithTotient(Stats data, int k, int iterations, bool debug)
+        public static Stats CompareNWithTotient(Stats data, int start, int stop, int iterations, bool debug)
         {
             if(data == null) data = new Stats();
 
-            for (var x = 0; x < iterations; x++)
+            for (var i = start; i <= stop; i+=8)
             {
-                for (var i = 384; i <= k; i+=8)
+                for (var x = 0; x < iterations; x++)
                 {
                     var csp = new RSACryptoServiceProvider(i);
                     var parameters = csp.ExportParameters(true);
@@ -57,46 +57,52 @@ namespace CodeBreaker
                     var q = FromBigEndian(parameters.Q);
                     //StorePrime(q,i);
                     var n = BigInteger.Multiply(p, q);
-                    var tot = BigInteger.Multiply(p - 1, q - 1);
+                    
+                    if (data.Points.Exists(point => BigInteger.Compare(point.N, n) == 0)) continue;
 
+                    var tot = BigInteger.Multiply(p - 1, q - 1);
                     var nStr = n.ToString();
                     var totStr = tot.ToString();
                     var j = 0;
                     for (; j < nStr.Length; j++) if (nStr[j] != totStr[j]) break;
                     var xy = new XY(p, q, n, tot, i, j);
-
-                    if (!data.Points.Exists(point => BigInteger.Compare(point.N,xy.N) == 0))
-                        data.Points.Add(xy);
+                    data.Points.Add(xy);
                 }
             }
             data.LinearRegression();
-            var diffs = new List<List<int>>();
-            foreach (var xy in data.Points)
-            {
-                var expectedSigDigits = (int)Math.Round(data.Intercept + data.Slope * xy.X);
-                var maxString = xy.N.ToString().Substring(xy.Y);
-                var totString = xy.Totient.ToString().Substring(xy.Y);
-
-                var diff = new List<int>();
-                for (var i = 0; i < maxString.Length; i++)
-                {
-                    var nDigit = int.Parse(maxString[i] + "");
-                    var totDigit = int.Parse(totString[i] + "");
-                    diff.Add(Math.Abs(nDigit-totDigit));
-                }
-                diffs.Add(diff);
-
-                if (!debug) continue;
-                Console.WriteLine("\n  N: " + maxString);
-                Console.WriteLine("Tot: " + totString);
-                Console.WriteLine("Predicted Shared Digits: " + expectedSigDigits);
-                Console.WriteLine("Actual Shared Digits: " + xy.Y);
-                Console.WriteLine("Size: " + xy.X);
-                Console.WriteLine("Diff: " + xy.Diff);
-            }
 
             if (debug)
             {
+                var diffs = new List<List<int>>();
+                var diffMagCount = 0;
+                var sharedCount = 0;
+                foreach (var xy in data.Points)
+                {
+                    var expectedSigDigits = (int)Math.Round((data.Intercept + data.Slope * xy.X) - .5);
+                    var maxString = xy.N.ToString().Substring(xy.Y);
+                    var totString = xy.Totient.ToString().Substring(xy.Y);
+
+                    var mag = (int)Math.Round((xy.X / data.DiffFactor) - 1);
+
+                    var diff = new List<int>();
+                    for (var i = 0; i < maxString.Length; i++)
+                    {
+                        var nDigit = int.Parse(maxString[i] + "");
+                        var totDigit = int.Parse(totString[i] + "");
+                        diff.Add(Math.Abs(nDigit - totDigit));
+                    }
+                    diffs.Add(diff);
+
+                    Console.WriteLine("Size: " + xy.X);
+                    Console.WriteLine("\n  N: " + maxString);
+                    Console.WriteLine("Tot: " + totString);
+                    Console.WriteLine("Predicted Shared Digits: " + expectedSigDigits);
+                    Console.WriteLine("Actual Shared Digits: " + xy.Y);
+                    Console.WriteLine("Estimated Diff Magnitude: " + mag);
+                    if (Math.Abs(mag - xy.Y) <= 1) diffMagCount++;
+                    if (Math.Abs(expectedSigDigits - xy.Y) <= 1) sharedCount++;
+                    Console.WriteLine("Diff: " + xy.Diff);
+                }
                 Console.WriteLine("\nFirst Digit Diffs:");
                 for (var i = 0; i < 10; i++)
                     Console.WriteLine(i + ": " + diffs.Count(d => d[0] == i));
@@ -104,8 +110,10 @@ namespace CodeBreaker
                 for (var i = 0; i < 10; i++)
                     Console.WriteLine(i + ": " + diffs.Count(d => d[0] < 4 && d[1] == i));
 
+                Console.WriteLine("Times Predicted Diff Mag = Actual Shared Digits +- 1: " + diffMagCount + "/" + data.Points.Count);
+                Console.WriteLine("Times PredictedSharedDigits = Actual Shared Digits +- 1: " + sharedCount + "/" + data.Points.Count);
             }
-            
+
             data.Points.RemoveAll(p => p.Ratio > 1);
             return data;
         }
@@ -134,30 +142,34 @@ namespace CodeBreaker
         public static BigInteger GuessTotient(Stats data, BigInteger n, int keySize, BigInteger e, BigInteger realTotient)
         {
             var totient = BigInteger.MinusOne;
-            var expectedSigDigits = (int)Math.Round((data.Intercept + data.Slope * keySize)-3.5);
+            var expectedSigDigits = (int)Math.Round((data.Intercept + data.Slope * keySize)-.5);
 
             var baseNString = n.ToString().Substring(0,expectedSigDigits);
             var maxString = n.ToString().Substring(expectedSigDigits);
-            var max = BigInteger.Parse(maxString);
-            var min = (BigInteger)BigFloat.Round(BigFloat.Multiply(new BigFloat(max), data.AverageRatio));
+            var max = BigInteger.Subtract(BigInteger.Parse(maxString), BigInteger.One);
+            var mag = (int)Math.Round((keySize / data.DiffFactor) - 1);
+            var minDiffString = "1";
+            while (minDiffString.Length <= mag)
+                minDiffString += "0";
+            var minDiff = BigInteger.Parse(minDiffString);
+            max = BigInteger.Subtract(max, minDiff);
+            var min = BigInteger.Parse(maxString.Substring(1));
 
-            //Remove after testing
+
+            //Remove this block after testing
             var nStr = n.ToString();
             var totStr = realTotient.ToString();
             var actualShared = 0;
             for (; actualShared < n.ToString().Length; actualShared++) if (nStr[actualShared] != totStr[actualShared]) break;
-            var target = BigInteger.Parse(realTotient.ToString().Substring(actualShared));
-
+            var target = BigInteger.Parse(realTotient.ToString().Substring(expectedSigDigits));
             Console.WriteLine("\n      N: " + nStr.Substring(actualShared));
             Console.WriteLine("Totient: " + totStr.Substring(actualShared));
             Console.WriteLine("Predicted Shared: "+expectedSigDigits);
             Console.WriteLine("Actual Shared: "+actualShared);
-
-            var mag = (int) Math.Round((keySize / data.DiffFactor)+3.5);
-            Console.WriteLine("Diff: " + double.Parse(BigInteger.Subtract(max,target).ToString()));
+            Console.WriteLine("Diff: " + double.Parse(BigInteger.Subtract(n,realTotient).ToString()));
             Console.WriteLine("Estimated Diff Magnitude: " + mag);
+            Console.WriteLine(max >= target && target >= min);
 
-            max = BigInteger.Subtract(max, BigInteger.One);
 
             Parallel.ForEach(BigIntSequenceReverse(min, max), (i, state) =>
             {

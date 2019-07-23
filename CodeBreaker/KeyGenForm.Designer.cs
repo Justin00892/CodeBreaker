@@ -34,6 +34,10 @@
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(KeyGenForm));
             this.keySizeLabel = new System.Windows.Forms.Label();
             this.keyWarningLabel = new System.Windows.Forms.Label();
             this.runButton = new System.Windows.Forms.Button();
@@ -44,12 +48,20 @@
             this.sizeDiffTab = new System.Windows.Forms.TabPage();
             this.dataChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.tabPanel = new System.Windows.Forms.TabControl();
+            this.nTab = new System.Windows.Forms.TabPage();
+            this.nChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.loadingPanel = new System.Windows.Forms.Panel();
+            this.loadingIcon = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.keySizeBox)).BeginInit();
             this.distanceTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.distanceChart)).BeginInit();
             this.sizeDiffTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataChart)).BeginInit();
             this.tabPanel.SuspendLayout();
+            this.nTab.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nChart)).BeginInit();
+            this.loadingPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.loadingIcon)).BeginInit();
             this.SuspendLayout();
             // 
             // keySizeLabel
@@ -136,6 +148,7 @@
             // 
             // distanceChart
             // 
+            chartArea1.AxisX.ScaleBreakStyle.Enabled = true;
             chartArea1.AxisX.Title = "Size (bits)";
             chartArea1.AxisY.IsLogarithmic = true;
             chartArea1.AxisY.MajorTickMark.Interval = 0D;
@@ -205,11 +218,73 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tabPanel.Controls.Add(this.sizeDiffTab);
             this.tabPanel.Controls.Add(this.distanceTab);
+            this.tabPanel.Controls.Add(this.nTab);
             this.tabPanel.Location = new System.Drawing.Point(12, 52);
             this.tabPanel.Name = "tabPanel";
             this.tabPanel.SelectedIndex = 0;
             this.tabPanel.Size = new System.Drawing.Size(500, 305);
             this.tabPanel.TabIndex = 9;
+            // 
+            // nTab
+            // 
+            this.nTab.Controls.Add(this.nChart);
+            this.nTab.Location = new System.Drawing.Point(4, 22);
+            this.nTab.Name = "nTab";
+            this.nTab.Size = new System.Drawing.Size(492, 279);
+            this.nTab.TabIndex = 2;
+            this.nTab.Text = "N vs Totient";
+            this.nTab.UseVisualStyleBackColor = true;
+            // 
+            // nChart
+            // 
+            chartArea3.AxisX.IsLogarithmic = true;
+            chartArea3.AxisX.Minimum = 1E+55D;
+            chartArea3.AxisX.Title = "N";
+            chartArea3.AxisY.IsLogarithmic = true;
+            chartArea3.AxisY.MajorTickMark.Interval = 0D;
+            chartArea3.AxisY.MajorTickMark.IntervalOffset = 0D;
+            chartArea3.AxisY.MajorTickMark.IntervalOffsetType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
+            chartArea3.AxisY.MajorTickMark.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
+            chartArea3.AxisY.Minimum = 1E+55D;
+            chartArea3.AxisY.ScaleBreakStyle.Enabled = true;
+            chartArea3.AxisY.Title = "Totient";
+            chartArea3.AxisY2.IsMarginVisible = false;
+            chartArea3.Name = "ChartArea1";
+            this.nChart.ChartAreas.Add(chartArea3);
+            this.nChart.Dock = System.Windows.Forms.DockStyle.Fill;
+            legend3.Name = "Legend1";
+            this.nChart.Legends.Add(legend3);
+            this.nChart.Location = new System.Drawing.Point(0, 0);
+            this.nChart.Margin = new System.Windows.Forms.Padding(2);
+            this.nChart.Name = "nChart";
+            this.nChart.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            series3.Legend = "Legend1";
+            series3.Name = "Series1";
+            this.nChart.Series.Add(series3);
+            this.nChart.Size = new System.Drawing.Size(492, 279);
+            this.nChart.TabIndex = 9;
+            this.nChart.Text = "nChart";
+            // 
+            // loadingPanel
+            // 
+            this.loadingPanel.Controls.Add(this.loadingIcon);
+            this.loadingPanel.Location = new System.Drawing.Point(12, 52);
+            this.loadingPanel.Name = "loadingPanel";
+            this.loadingPanel.Size = new System.Drawing.Size(500, 317);
+            this.loadingPanel.TabIndex = 10;
+            this.loadingPanel.Visible = false;
+            // 
+            // loadingIcon
+            // 
+            this.loadingIcon.Image = ((System.Drawing.Image)(resources.GetObject("loadingIcon.Image")));
+            this.loadingIcon.Location = new System.Drawing.Point(3, 3);
+            this.loadingIcon.Name = "loadingIcon";
+            this.loadingIcon.Size = new System.Drawing.Size(493, 311);
+            this.loadingIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.loadingIcon.TabIndex = 0;
+            this.loadingIcon.TabStop = false;
             // 
             // KeyGenForm
             // 
@@ -223,6 +298,7 @@
             this.Controls.Add(this.runButton);
             this.Controls.Add(this.keyWarningLabel);
             this.Controls.Add(this.keySizeLabel);
+            this.Controls.Add(this.loadingPanel);
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "KeyGenForm";
             this.Text = "KeyGenForm";
@@ -232,6 +308,10 @@
             this.sizeDiffTab.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataChart)).EndInit();
             this.tabPanel.ResumeLayout(false);
+            this.nTab.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.nChart)).EndInit();
+            this.loadingPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.loadingIcon)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -249,5 +329,9 @@
         private System.Windows.Forms.TabPage sizeDiffTab;
         private System.Windows.Forms.DataVisualization.Charting.Chart dataChart;
         private System.Windows.Forms.TabControl tabPanel;
+        private System.Windows.Forms.TabPage nTab;
+        private System.Windows.Forms.DataVisualization.Charting.Chart nChart;
+        private System.Windows.Forms.Panel loadingPanel;
+        private System.Windows.Forms.PictureBox loadingIcon;
     }
 }

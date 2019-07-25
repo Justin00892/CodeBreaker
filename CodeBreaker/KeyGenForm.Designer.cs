@@ -28,15 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea10 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend10 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series10 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea11 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend11 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series11 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea12 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend12 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series12 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(KeyGenForm));
             this.keySizeLabel = new System.Windows.Forms.Label();
             this.keyWarningLabel = new System.Windows.Forms.Label();
@@ -48,6 +48,10 @@
             this.sizeDiffTab = new System.Windows.Forms.TabPage();
             this.dataChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.tabPanel = new System.Windows.Forms.TabControl();
+            this.sizeTab = new System.Windows.Forms.TabPage();
+            this.sizeChartLive = new LiveCharts.WinForms.CartesianChart();
+            this.nLiveTab = new System.Windows.Forms.TabPage();
+            this.versusChart = new LiveCharts.WinForms.CartesianChart();
             this.nTab = new System.Windows.Forms.TabPage();
             this.nChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.loadingPanel = new System.Windows.Forms.Panel();
@@ -60,6 +64,8 @@
             this.sizeDiffTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataChart)).BeginInit();
             this.tabPanel.SuspendLayout();
+            this.sizeTab.SuspendLayout();
+            this.nLiveTab.SuspendLayout();
             this.nTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nChart)).BeginInit();
             this.loadingPanel.SuspendLayout();
@@ -152,29 +158,29 @@
             // 
             // distanceChart
             // 
-            chartArea10.AxisX.ScaleBreakStyle.Enabled = true;
-            chartArea10.AxisX.Title = "Size (bits)";
-            chartArea10.AxisY.IsLogarithmic = true;
-            chartArea10.AxisY.MajorTickMark.Interval = 0D;
-            chartArea10.AxisY.MajorTickMark.IntervalOffset = 0D;
-            chartArea10.AxisY.MajorTickMark.IntervalOffsetType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
-            chartArea10.AxisY.MajorTickMark.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
-            chartArea10.AxisY.Title = "N Minus Totient";
-            chartArea10.AxisY2.IsMarginVisible = false;
-            chartArea10.Name = "ChartArea1";
-            this.distanceChart.ChartAreas.Add(chartArea10);
+            chartArea1.AxisX.ScaleBreakStyle.Enabled = true;
+            chartArea1.AxisX.Title = "Size (bits)";
+            chartArea1.AxisY.IsLogarithmic = true;
+            chartArea1.AxisY.MajorTickMark.Interval = 0D;
+            chartArea1.AxisY.MajorTickMark.IntervalOffset = 0D;
+            chartArea1.AxisY.MajorTickMark.IntervalOffsetType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
+            chartArea1.AxisY.MajorTickMark.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
+            chartArea1.AxisY.Title = "N Minus Totient";
+            chartArea1.AxisY2.IsMarginVisible = false;
+            chartArea1.Name = "ChartArea1";
+            this.distanceChart.ChartAreas.Add(chartArea1);
             this.distanceChart.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend10.Name = "Legend1";
-            this.distanceChart.Legends.Add(legend10);
+            legend1.Name = "Legend1";
+            this.distanceChart.Legends.Add(legend1);
             this.distanceChart.Location = new System.Drawing.Point(3, 3);
             this.distanceChart.Margin = new System.Windows.Forms.Padding(2);
             this.distanceChart.Name = "distanceChart";
             this.distanceChart.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
-            series10.ChartArea = "ChartArea1";
-            series10.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
-            series10.Legend = "Legend1";
-            series10.Name = "Series1";
-            this.distanceChart.Series.Add(series10);
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.distanceChart.Series.Add(series1);
             this.distanceChart.Size = new System.Drawing.Size(486, 273);
             this.distanceChart.TabIndex = 8;
             this.distanceChart.Text = "distanceChart";
@@ -192,25 +198,25 @@
             // 
             // dataChart
             // 
-            chartArea11.AxisX.Title = "Key Size (bits)";
-            chartArea11.AxisY.Maximum = 100D;
-            chartArea11.AxisY.Minimum = 0D;
-            chartArea11.AxisY.Title = "Common Significant Digits";
-            chartArea11.AxisY2.IsMarginVisible = false;
-            chartArea11.Name = "ChartArea1";
-            this.dataChart.ChartAreas.Add(chartArea11);
+            chartArea2.AxisX.Title = "Key Size (bits)";
+            chartArea2.AxisY.Maximum = 100D;
+            chartArea2.AxisY.Minimum = 0D;
+            chartArea2.AxisY.Title = "Common Significant Digits";
+            chartArea2.AxisY2.IsMarginVisible = false;
+            chartArea2.Name = "ChartArea1";
+            this.dataChart.ChartAreas.Add(chartArea2);
             this.dataChart.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend11.Name = "Legend1";
-            this.dataChart.Legends.Add(legend11);
+            legend2.Name = "Legend1";
+            this.dataChart.Legends.Add(legend2);
             this.dataChart.Location = new System.Drawing.Point(3, 3);
             this.dataChart.Margin = new System.Windows.Forms.Padding(2);
             this.dataChart.Name = "dataChart";
             this.dataChart.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
-            series11.ChartArea = "ChartArea1";
-            series11.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
-            series11.Legend = "Legend1";
-            series11.Name = "Series1";
-            this.dataChart.Series.Add(series11);
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.dataChart.Series.Add(series2);
             this.dataChart.Size = new System.Drawing.Size(486, 273);
             this.dataChart.TabIndex = 7;
             this.dataChart.Text = "dataChart";
@@ -220,6 +226,8 @@
             this.tabPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabPanel.Controls.Add(this.sizeTab);
+            this.tabPanel.Controls.Add(this.nLiveTab);
             this.tabPanel.Controls.Add(this.sizeDiffTab);
             this.tabPanel.Controls.Add(this.distanceTab);
             this.tabPanel.Controls.Add(this.nTab);
@@ -228,6 +236,44 @@
             this.tabPanel.SelectedIndex = 0;
             this.tabPanel.Size = new System.Drawing.Size(500, 305);
             this.tabPanel.TabIndex = 9;
+            // 
+            // sizeTab
+            // 
+            this.sizeTab.Controls.Add(this.sizeChartLive);
+            this.sizeTab.Location = new System.Drawing.Point(4, 22);
+            this.sizeTab.Name = "sizeTab";
+            this.sizeTab.Size = new System.Drawing.Size(492, 279);
+            this.sizeTab.TabIndex = 3;
+            this.sizeTab.Text = "Size (Live)";
+            this.sizeTab.UseVisualStyleBackColor = true;
+            // 
+            // sizeChartLive
+            // 
+            this.sizeChartLive.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.sizeChartLive.Location = new System.Drawing.Point(0, 0);
+            this.sizeChartLive.Name = "sizeChartLive";
+            this.sizeChartLive.Size = new System.Drawing.Size(492, 279);
+            this.sizeChartLive.TabIndex = 0;
+            this.sizeChartLive.Text = "Size Chart";
+            // 
+            // nLiveTab
+            // 
+            this.nLiveTab.Controls.Add(this.versusChart);
+            this.nLiveTab.Location = new System.Drawing.Point(4, 22);
+            this.nLiveTab.Name = "nLiveTab";
+            this.nLiveTab.Size = new System.Drawing.Size(492, 279);
+            this.nLiveTab.TabIndex = 4;
+            this.nLiveTab.Text = "N vs Totient (Live)";
+            this.nLiveTab.UseVisualStyleBackColor = true;
+            // 
+            // versusChart
+            // 
+            this.versusChart.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.versusChart.Location = new System.Drawing.Point(0, 0);
+            this.versusChart.Name = "versusChart";
+            this.versusChart.Size = new System.Drawing.Size(492, 279);
+            this.versusChart.TabIndex = 1;
+            this.versusChart.Text = "Size Chart";
             // 
             // nTab
             // 
@@ -241,32 +287,30 @@
             // 
             // nChart
             // 
-            chartArea12.AxisX.IsLogarithmic = true;
-            chartArea12.AxisX.Minimum = 1E+55D;
-            chartArea12.AxisX.Title = "N";
-            chartArea12.AxisY.IsLogarithmic = true;
-            chartArea12.AxisY.MajorTickMark.Interval = 0D;
-            chartArea12.AxisY.MajorTickMark.IntervalOffset = 0D;
-            chartArea12.AxisY.MajorTickMark.IntervalOffsetType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
-            chartArea12.AxisY.MajorTickMark.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
-            chartArea12.AxisY.Minimum = 1E+55D;
-            chartArea12.AxisY.ScaleBreakStyle.Enabled = true;
-            chartArea12.AxisY.Title = "Totient";
-            chartArea12.AxisY2.IsMarginVisible = false;
-            chartArea12.Name = "ChartArea1";
-            this.nChart.ChartAreas.Add(chartArea12);
+            chartArea3.AxisX.Minimum = 1E+55D;
+            chartArea3.AxisX.Title = "N";
+            chartArea3.AxisY.MajorTickMark.Interval = 0D;
+            chartArea3.AxisY.MajorTickMark.IntervalOffset = 0D;
+            chartArea3.AxisY.MajorTickMark.IntervalOffsetType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
+            chartArea3.AxisY.MajorTickMark.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
+            chartArea3.AxisY.Minimum = 1E+55D;
+            chartArea3.AxisY.ScaleBreakStyle.Enabled = true;
+            chartArea3.AxisY.Title = "Totient";
+            chartArea3.AxisY2.IsMarginVisible = false;
+            chartArea3.Name = "ChartArea1";
+            this.nChart.ChartAreas.Add(chartArea3);
             this.nChart.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend12.Name = "Legend1";
-            this.nChart.Legends.Add(legend12);
+            legend3.Name = "Legend1";
+            this.nChart.Legends.Add(legend3);
             this.nChart.Location = new System.Drawing.Point(0, 0);
             this.nChart.Margin = new System.Windows.Forms.Padding(2);
             this.nChart.Name = "nChart";
             this.nChart.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
-            series12.ChartArea = "ChartArea1";
-            series12.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
-            series12.Legend = "Legend1";
-            series12.Name = "Series1";
-            this.nChart.Series.Add(series12);
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            series3.Legend = "Legend1";
+            series3.Name = "Series1";
+            this.nChart.Series.Add(series3);
             this.nChart.Size = new System.Drawing.Size(492, 279);
             this.nChart.TabIndex = 9;
             this.nChart.Text = "nChart";
@@ -347,6 +391,8 @@
             this.sizeDiffTab.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataChart)).EndInit();
             this.tabPanel.ResumeLayout(false);
+            this.sizeTab.ResumeLayout(false);
+            this.nLiveTab.ResumeLayout(false);
             this.nTab.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.nChart)).EndInit();
             this.loadingPanel.ResumeLayout(false);
@@ -375,5 +421,9 @@
         private System.Windows.Forms.PictureBox loadingIcon;
         private System.Windows.Forms.Label repLabel;
         private System.Windows.Forms.NumericUpDown replicatesBox;
+        private System.Windows.Forms.TabPage sizeTab;
+        private LiveCharts.WinForms.CartesianChart sizeChartLive;
+        private System.Windows.Forms.TabPage nLiveTab;
+        private LiveCharts.WinForms.CartesianChart versusChart;
     }
 }

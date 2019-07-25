@@ -1,11 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using CodeBreaker.Models;
 using Extreme.Mathematics;
+using LiveCharts;
+using LiveCharts.Configurations;
+using LiveCharts.Defaults;
+using LiveCharts.Wpf;
+using Series = LiveCharts.Wpf.Series;
+using SeriesCollection = LiveCharts.SeriesCollection;
 
 namespace CodeBreaker
 {
@@ -13,20 +21,23 @@ namespace CodeBreaker
     {
         private int _size = 512;
         private int _replicates = 100;
-        private Stats _data;
+        private readonly Stats _data;
+        private List<ScatterSeries> _series = new List<ScatterSeries>();
         public KeyGenForm()
         {
             InitializeComponent();
+            _data = new Stats();
             dataChart.Series.Clear();
             distanceChart.Series.Clear();
             nChart.Series.Clear();
+            sizeChartLive.Series.Clear();
         }
 
         private async void RunButton_Click(object sender, EventArgs e)
         {
             runButton.Enabled = false;
-            loadingPanel.BringToFront();
-            loadingPanel.Visible = true;
+            //loadingPanel.BringToFront();
+            //loadingPanel.Visible = true;
             var enteredSize = keySizeBox.Value;
             if (enteredSize < 384 || enteredSize > 16384) keyWarningLabel.Text = "Range: 384 - 16384";
             else if (enteredSize % 8 != 0) keyWarningLabel.Text = "Must be increments of 8";
@@ -35,16 +46,65 @@ namespace CodeBreaker
                 keyWarningLabel.Text = "";
                 _size = (int)enteredSize;
                 _replicates = (int) replicatesBox.Value;
-                _data = await Task<Stats>.Factory.StartNew(() => Crypto.CompareNWithTotient(_data,384,_size,_replicates,false));
+                var points = await Task<List<XY>>.Factory.StartNew(() => Crypto.CompareNWithTotient(384, _size, _replicates, false));
+                _data.AddPoints(points);
                 MakeGraph(_data);
+
             }
 
-            loadingPanel.Visible = false;
-            loadingPanel.SendToBack();
+            //loadingPanel.Visible = false;
+            //loadingPanel.SendToBack();
             runButton.Enabled = true;
         }
 
         private void MakeGraph(Stats data)
+        {
+            var series = sizeChartLive.Series.FirstOrDefault(s => s.Title == "Data") ?? new ScatterSeries
+            {
+                Title = "Data",
+                Values = new ChartValues<ObservablePoint>()
+            };
+            foreach (var xy in data.Points)
+                series.Values.Add(new ObservablePoint(xy.X, xy.Y));
+
+            sizeChartLive.Series.Add(series);
+
+            var mapper = Mappers.Xy<ObservablePoint>()
+                .X(p => Math.Log(p.X, 10))
+                .Y(p => Math.Log(p.Y, 10));
+
+            var collection = new SeriesCollection(mapper);
+            for (var i = 384; i <= _size; i += 8)
+            {
+                var nSeries = new ScatterSeries
+                {
+                    Title = "Size: " + i,
+                    Values = new ChartValues<ObservablePoint>(),
+                    PointGeometry = DefaultGeometries.Diamond
+                };
+                foreach (var xy in data.Points.Where(p => p.X == i))
+                {
+                    nSeries.Values.Add(new ObservablePoint(double.Parse(xy.NDynamic.ToString()),
+                        double.Parse(xy.TotDynamic.ToString())));
+                }
+                _series.Add(nSeries);
+                collection.Add(nSeries);
+            }
+
+            versusChart.DataClick += (sender, point) =>
+            {
+                var pSeries = _series.First(s => s.Values.GetPoints(s).Contains(point));
+                pSeries.Visibility = Visibility.Collapsed;
+            };
+
+            versusChart.LegendLocation = LegendLocation.Right;
+            //versusChart.AxisX[0].Title = "N";
+            //versusChart.AxisY[0].Title = "Totient";
+            versusChart.Zoom = ZoomingOptions.Xy;
+            versusChart.Series = collection;
+        }
+
+        private void MakeGraphOld(Stats data)
         {
             var series = dataChart.Series.FindByName("Data") ?? dataChart.Series.Add("Data");
             series.ChartType = SeriesChartType.Point;
@@ -67,8 +127,9 @@ namespace CodeBreaker
 
             var xMin = series.Points.FindMinByValue("X")?.XValue ?? 0;
             var xMax = series.Points.FindMaxByValue("X")?.XValue ?? 1;
-            var minPoint = data.Intercept + data.Slope * xMin;
-            var maxPoint = data.Intercept + data.Slope * xMax;
+            var regression = data.Regression;
+            var minPoint = regression.Item2 + regression.Item1 * xMin;
+            var maxPoint = regression.Item2 + regression.Item1 * xMax;
             regressionLine.Points.AddXY(xMin, minPoint);
             regressionLine.Points.AddXY(xMax, maxPoint);
 

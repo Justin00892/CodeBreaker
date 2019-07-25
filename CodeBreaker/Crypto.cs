@@ -42,10 +42,10 @@ namespace CodeBreaker
             return result;
         }
 
-        public static Stats CompareNWithTotient(Stats data, int start, int stop, int iterations, bool debug)
+        public static List<XY> CompareNWithTotient(int start, int stop, int iterations, bool debug)
         {
-            if(data == null) data = new Stats();
-
+            
+            var points = new List<XY>();
             for (var i = start; i <= stop; i+=8)
             {
                 for (var x = 0; x < iterations; x++)
@@ -58,7 +58,7 @@ namespace CodeBreaker
                     //StorePrime(q,i);
                     var n = BigInteger.Multiply(p, q);
                     
-                    if (data.Points.Exists(point => BigInteger.Compare(point.N, n) == 0)) continue;
+                    if (points.Exists(point => BigInteger.Compare(point.N, n) == 0)) continue;
 
                     var tot = BigInteger.Multiply(p - 1, q - 1);
                     var nStr = n.ToString();
@@ -66,19 +66,21 @@ namespace CodeBreaker
                     var j = 0;
                     for (; j < nStr.Length; j++) if (nStr[j] != totStr[j]) break;
                     var xy = new XY(p, q, n, tot, i, j);
-                    data.Points.Add(xy);
+                    points.Add(xy);
                 }
             }
-            data.LinearRegression();
-
+            
             if (debug)
             {
+                var data = new Stats();
+                data.AddPoints(points);
                 var diffs = new List<List<int>>();
                 var diffMagCount = 0;
                 var sharedCount = 0;
                 foreach (var xy in data.Points)
                 {
-                    var expectedSigDigits = (int)Math.Round((data.Intercept + data.Slope * xy.X) - .5);
+                    var (slope, intercept) = data.Regression;
+                    var expectedSigDigits = (int)Math.Round((intercept + slope * xy.X) - .5);
                     var maxString = xy.N.ToString().Substring(xy.Y);
                     var totString = xy.Totient.ToString().Substring(xy.Y);
 
@@ -107,7 +109,7 @@ namespace CodeBreaker
                     if (Math.Abs(expectedSigDigits - xy.Y) <= 1) sharedCount++;
                     Console.WriteLine("Diff: " + xy.Diff);
                 }
-                Console.WriteLine("\nSample Size: " + data.Points.Count);
+                Console.WriteLine("\nSample Size: " + data.Points.Count());
                 Console.WriteLine("First Digit Diffs:");
                 for (var i = 0; i < 10; i++)
                     Console.WriteLine(i + ": " + diffs.Count(d => d[0] == i));
@@ -119,8 +121,7 @@ namespace CodeBreaker
                 //Console.WriteLine("Times PredictedSharedDigits = Actual Shared Digits +- 1: " + sharedCount + "/" + data.Points.Count);
             }
 
-            data.Points.RemoveAll(p => p.Ratio > 1);
-            return data;
+            return points;
         }
 
         public static void AttemptFactor(BigInteger n, int size)
@@ -147,7 +148,8 @@ namespace CodeBreaker
         public static BigInteger GuessTotient(Stats data, BigInteger n, int keySize, BigInteger e, BigInteger realTotient)
         {
             var totient = BigInteger.MinusOne;
-            var expectedSigDigits = (int)Math.Round((data.Intercept + data.Slope * keySize)-.5);
+            var regression = data.Regression;
+            var expectedSigDigits = (int)Math.Round((regression.Item2 + regression.Item1 * keySize)-.5);
 
             var baseNString = n.ToString().Substring(0,expectedSigDigits);
             var maxString = n.ToString().Substring(expectedSigDigits);

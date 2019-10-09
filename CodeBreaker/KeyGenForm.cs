@@ -4,14 +4,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using CodeBreaker.Models;
 using Extreme.Mathematics;
 using LiveCharts;
 using LiveCharts.Configurations;
 using LiveCharts.Defaults;
 using LiveCharts.Wpf;
+using Objects.Models;
 using SeriesCollection = LiveCharts.SeriesCollection;
-using Stats = ObjectModels.Models.Stats;
 
 namespace CodeBreaker
 {
@@ -116,10 +115,7 @@ namespace CodeBreaker
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            var totientGuess = await Task<BigInteger>.Factory.StartNew(() =>
-            {
-                return Crypto.GuessTotient(_data, n, keySize, publicKey, realTotient, false);
-            });
+            var totientGuess = await Task<BigInteger>.Factory.StartNew(() => Crypto.GuessTotient(_data, n, keySize, publicKey, realTotient, false));
             stopwatch.Stop();
             Console.WriteLine(stopwatch.Elapsed);
             testButton.Enabled = true;

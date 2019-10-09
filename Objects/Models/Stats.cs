@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CodeBreaker.Models;
 using Extreme.Mathematics;
 using Extreme.Statistics;
 
-namespace ObjectModels.Models
+namespace Objects.Models
 {
     public class Stats
     {

@@ -2,7 +2,7 @@
 using System.Globalization;
 using Extreme.Mathematics;
 
-namespace CodeBreaker.Models
+namespace Objects.Models
 {
     public class XY
     {

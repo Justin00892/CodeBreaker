@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Threading;
-using CodeBreaker.Models;
+using Alea;
+using Alea.Parallel;
 using Extreme.Mathematics;
-using Hybridizer.Runtime.CUDAImports;
-using Stats = ObjectModels.Models.Stats;
+using Objects.Models;
 
 namespace CodeBreaker
 {
@@ -122,14 +121,13 @@ namespace CodeBreaker
             return points;
         }
 
-        [EntryPoint]
         public static BigInteger GuessTotient(Stats data, BigInteger n, int keySize, BigInteger e, BigInteger realTotient, bool debug)
         {
             var totient = BigInteger.MinusOne;
             var expectedSigDigits = (int)Math.Round(data.SigDigitsRegression.GetRegressionCurve().ValueAt(keySize) - .5);
 
             var baseNString = n.ToString().Substring(0, expectedSigDigits);
-            var dynamicNDouble = Double.Parse((string)BigInteger.Parse(n.ToString().Substring(expectedSigDigits)).ToString());
+            var dynamicNDouble = double.Parse(BigInteger.Parse(n.ToString().Substring(expectedSigDigits)).ToString());
 
             //Remove this block after testing
             var nStr = n.ToString();
@@ -142,7 +140,7 @@ namespace CodeBreaker
             var min = interval.LowerBound < 0 ? 0 : new BigInteger(interval.LowerBound);
             var max = new BigInteger(interval.UpperBound);
 
-            Console.WriteLine((object)interval);
+            Console.WriteLine(interval);
             Console.WriteLine("Number Of Logical Processors: {0}", Environment.ProcessorCount);
 
             if (debug)
@@ -151,32 +149,33 @@ namespace CodeBreaker
                 Console.WriteLine("Totient: " + totStr.Substring(actualShared));
                 Console.WriteLine("Predicted Shared: " + expectedSigDigits);
                 Console.WriteLine("Actual Shared: " + actualShared);
-                Console.WriteLine("Diff: " + Double.Parse((string)BigInteger.Subtract(n, realTotient).ToString()));
+                Console.WriteLine("Diff: " + double.Parse(BigInteger.Subtract(n, realTotient).ToString()));
                 //Console.WriteLine("Estimated Diff Magnitude: " + mag);
                 //Console.WriteLine(max >= target && target >= min);
             }
 
-            var threadCount = Environment.ProcessorCount;
-            var threads = new List<Thread>();
-            for (var x = 0; x < threadCount; x++)
+            var gpu = Gpu.Default;
+            var threadCount = gpu.Device.Cores;
+
+            var test = max.ToByteArray();
+            var test2 = new BigInteger(test);
+            var test3 = BigInteger.Compare(max, test2);
+
+            void Cyclic(int id)
             {
-                var t = new Thread(id =>
+                
+                /*
+                for (var i = BigInteger.Add(min,id); i <= max; i += threadCount)
                 {
-                    for (var i = min + (int)id; i <= max; i += threadCount)
-                    {
-                        if (BigInteger.Compare(i, target) != 0) continue;
-                        Console.WriteLine("Thread: " + id);
-                        Console.WriteLine("Totient: " + i);
-                        break;
-                    }
-                });
-                threads.Add(t);
+                    if (BigInteger.Compare(i, target) != 0) continue;
+                    Console.WriteLine("Thread: " + id);
+                    Console.WriteLine("Totient: " + i);
+                    break;
+                }
+                */
             }
 
-            for (var i = 0; i < threadCount; i++)
-                threads[i].Start(i);
-            foreach (var thread in threads)
-                thread.Join();
+            gpu.For(0,threadCount,Cyclic);
 
             /*
             Parallel.ForEach(BigIntSequenceReverse(min, max), (i, state) =>

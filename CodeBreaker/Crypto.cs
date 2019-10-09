@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
+using System.Threading;
 using CodeBreaker.Models;
 using Extreme.Mathematics;
+using Hybridizer.Runtime.CUDAImports;
+using Stats = ObjectModels.Models.Stats;
 
 namespace CodeBreaker
 {
@@ -75,12 +77,12 @@ namespace CodeBreaker
                 var data = new Stats();
                 data.AddPoints(points);
                 var diffs = new List<List<int>>();
-                var diffMagCount = 0;
-                var sharedCount = 0;
+                var same = 0.0;
                 foreach (var xy in data.Points)
                 {
-                    var (slope, intercept) = data.Regression;
-                    var expectedSigDigits = (int)Math.Round((intercept + slope * xy.X) - .5);
+                    var expectedSigDigits = Math.Round(data.SigDigitsRegression.GetRegressionCurve().ValueAt(xy.X)-.5);
+                    if (expectedSigDigits <= xy.Y)
+                        same++;
                     var maxString = xy.N.ToString().Substring(xy.Y);
                     var totString = xy.Totient.ToString().Substring(xy.Y);
 
@@ -105,63 +107,29 @@ namespace CodeBreaker
                     Console.WriteLine("  N: " + maxString);
                     Console.WriteLine("Tot: " + totString);
                     Console.WriteLine("Estimated Diff Magnitude: " + mag);
-                    if (Math.Abs(mag - xy.Y) <= 1) diffMagCount++;
-                    if (Math.Abs(expectedSigDigits - xy.Y) <= 1) sharedCount++;
                     Console.WriteLine("Diff: " + xy.Diff);
                 }
-                Console.WriteLine("\nSample Size: " + data.Points.Count());
+                Console.WriteLine("\nSample Size: " + data.Points.Count);
+                Console.WriteLine("Prediction Accuracy: " + same/data.Points.Count);
                 Console.WriteLine("First Digit Diffs:");
                 for (var i = 0; i < 10; i++)
                     Console.WriteLine(i + ": " + diffs.Count(d => d[0] == i));
                 Console.WriteLine("First Digit Diff < 4: Second Digit Diffs:");
                 for (var i = 0; i < 10; i++)
                     Console.WriteLine(i + ": " + diffs.Count(d => d[0] < 4 && d[1] == i));
-
-                //Console.WriteLine("Times Predicted Diff Mag = Actual Shared Digits +- 1: " + diffMagCount + "/" + data.Points.Count);
-                //Console.WriteLine("Times PredictedSharedDigits = Actual Shared Digits +- 1: " + sharedCount + "/" + data.Points.Count);
             }
 
             return points;
         }
 
-        public static void AttemptFactor(BigInteger n, int size)
-        {
-            using (var context = new PrimeContext())
-            {
-                foreach (var s in context.Primes.Where(p => p.Size == size))
-                {
-                    var p = BigInteger.Parse(s.NumberString);
-                    var q = BigInteger.Divide(n, p);
-
-                    if (context.Primes.Any(pr => pr.NumberString == q.ToString())
-                        || IsPrime(q))
-                    {
-                        Console.WriteLine("N: "+n);
-                        Console.WriteLine("P: "+p);
-                        Console.WriteLine("Q: "+q);
-                        break;
-                    }                   
-                }
-            }
-        }
-
-        public static BigInteger GuessTotient(Stats data, BigInteger n, int keySize, BigInteger e, BigInteger realTotient)
+        [EntryPoint]
+        public static BigInteger GuessTotient(Stats data, BigInteger n, int keySize, BigInteger e, BigInteger realTotient, bool debug)
         {
             var totient = BigInteger.MinusOne;
-            var regression = data.Regression;
-            var expectedSigDigits = (int)Math.Round((regression.Item2 + regression.Item1 * keySize)-.5);
+            var expectedSigDigits = (int)Math.Round(data.SigDigitsRegression.GetRegressionCurve().ValueAt(keySize) - .5);
 
-            var baseNString = n.ToString().Substring(0,expectedSigDigits);
-            var maxString = n.ToString().Substring(expectedSigDigits);
-            var max = BigInteger.Subtract(BigInteger.Parse(maxString), BigInteger.One);
-            var mag = (int)Math.Round((keySize / data.DiffFactor) - 1);
-            var minDiffString = "1";
-            while (minDiffString.Length <= mag)
-                minDiffString += "0";
-            var minDiff = BigInteger.Parse(minDiffString);
-            max = BigInteger.Subtract(max, minDiff);
-            var min = BigInteger.Parse(maxString.Substring(1));
-
+            var baseNString = n.ToString().Substring(0, expectedSigDigits);
+            var dynamicNDouble = Double.Parse((string)BigInteger.Parse(n.ToString().Substring(expectedSigDigits)).ToString());
 
             //Remove this block after testing
             var nStr = n.ToString();
@@ -169,22 +137,58 @@ namespace CodeBreaker
             var actualShared = 0;
             for (; actualShared < n.ToString().Length; actualShared++) if (nStr[actualShared] != totStr[actualShared]) break;
             var target = BigInteger.Parse(realTotient.ToString().Substring(expectedSigDigits));
-            Console.WriteLine("\n      N: " + nStr.Substring(actualShared));
-            Console.WriteLine("Totient: " + totStr.Substring(actualShared));
-            Console.WriteLine("Predicted Shared: "+expectedSigDigits);
-            Console.WriteLine("Actual Shared: "+actualShared);
-            Console.WriteLine("Diff: " + double.Parse(BigInteger.Subtract(n,realTotient).ToString()));
-            Console.WriteLine("Estimated Diff Magnitude: " + mag);
-            Console.WriteLine(max >= target && target >= min);
 
+            var interval = data.MinRangeRegression.GetPredictionInterval(dynamicNDouble, .99);
+            var min = interval.LowerBound < 0 ? 0 : new BigInteger(interval.LowerBound);
+            var max = new BigInteger(interval.UpperBound);
 
+            Console.WriteLine((object)interval);
+            Console.WriteLine("Number Of Logical Processors: {0}", Environment.ProcessorCount);
+
+            if (debug)
+            {
+                Console.WriteLine("\n      N: " + nStr.Substring(actualShared));
+                Console.WriteLine("Totient: " + totStr.Substring(actualShared));
+                Console.WriteLine("Predicted Shared: " + expectedSigDigits);
+                Console.WriteLine("Actual Shared: " + actualShared);
+                Console.WriteLine("Diff: " + Double.Parse((string)BigInteger.Subtract(n, realTotient).ToString()));
+                //Console.WriteLine("Estimated Diff Magnitude: " + mag);
+                //Console.WriteLine(max >= target && target >= min);
+            }
+
+            var threadCount = Environment.ProcessorCount;
+            var threads = new List<Thread>();
+            for (var x = 0; x < threadCount; x++)
+            {
+                var t = new Thread(id =>
+                {
+                    for (var i = min + (int)id; i <= max; i += threadCount)
+                    {
+                        if (BigInteger.Compare(i, target) != 0) continue;
+                        Console.WriteLine("Thread: " + id);
+                        Console.WriteLine("Totient: " + i);
+                        break;
+                    }
+                });
+                threads.Add(t);
+            }
+
+            for (var i = 0; i < threadCount; i++)
+                threads[i].Start(i);
+            foreach (var thread in threads)
+                thread.Join();
+
+            /*
             Parallel.ForEach(BigIntSequenceReverse(min, max), (i, state) =>
             {
+                Console.WriteLine(i);
                 if (BigInteger.Compare(i,target) != 0) return;
                 totient = i;
                 state.Break();
             });
-            return BigInteger.Parse(baseNString+totient);
+            */
+
+            return BigInteger.Parse(baseNString + totient);
         }
 
         private static IEnumerable<BigInteger> BigIntSequence(BigInteger min,BigInteger max)
@@ -233,20 +237,7 @@ namespace CodeBreaker
             return v;
         }
 
-        public static void StorePrime(BigInteger p, int s)
-        {
-            using (var context = new PrimeContext())
-            {
-                var prime = new Prime {NumberString = p.ToString(), Size = s};
-                if (context.Primes.All(pr => pr.NumberString != prime.NumberString))
-                {
-                    context.Primes.Add(prime);
-                    context.SaveChanges();
-                }
-            }
-        }
-
-        public static bool IsPrime(BigInteger num)
+        private static bool IsPrime(BigInteger num)
         {
             var numStr = num.ToString();
             var lastChar = numStr[numStr.Length - 1];

@@ -11,6 +11,7 @@ using LiveCharts.Configurations;
 using LiveCharts.Defaults;
 using LiveCharts.Wpf;
 using SeriesCollection = LiveCharts.SeriesCollection;
+using Stats = ObjectModels.Models.Stats;
 
 namespace CodeBreaker
 {
@@ -60,6 +61,7 @@ namespace CodeBreaker
                 _minSize = (int) enteredMinSize;
                 _replicates = (int) replicatesBox.Value;
                 var points = await Task<List<XY>>.Factory.StartNew(() => Crypto.CompareNWithTotient(_minSize, _maxSize, _replicates, false));
+
                 _data.AddPoints(points);
                 MakeGraph(points);
             }
@@ -114,7 +116,10 @@ namespace CodeBreaker
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            var totientGuess = await Task<BigInteger>.Factory.StartNew(()=> Crypto.GuessTotient(_data,n,keySize,publicKey,realTotient));
+            var totientGuess = await Task<BigInteger>.Factory.StartNew(() =>
+            {
+                return Crypto.GuessTotient(_data, n, keySize, publicKey, realTotient, false);
+            });
             stopwatch.Stop();
             Console.WriteLine(stopwatch.Elapsed);
             testButton.Enabled = true;

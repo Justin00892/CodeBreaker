@@ -4,13 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Media;
+using CodeBreaker.Models;
 using Extreme.Mathematics;
 using Extreme.Statistics;
 using LiveCharts;
 using LiveCharts.Configurations;
 using LiveCharts.Defaults;
 using LiveCharts.Wpf;
-using Objects.Models;
 using Color = System.Drawing.Color;
 
 namespace CodeBreaker

@@ -190,13 +190,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Crypto.cs" />
-    <Compile Include="CryptoExternal\Crypto.cs" />
     <Compile Include="KeyGenForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="KeyGenForm.Designer.cs">
       <DependentUpon>KeyGenForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\Stats.cs" />
+    <Compile Include="Models\XY.cs" />
     <Compile Include="RSA.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -244,12 +245,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Objects\Objects.csproj">
-      <Project>{885625a6-684a-4039-9230-bd40e6fb7f38}</Project>
-      <Name>Objects</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />

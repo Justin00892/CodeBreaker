@@ -4,12 +4,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using CodeBreaker.Models;
 using Extreme.Mathematics;
 using LiveCharts;
 using LiveCharts.Configurations;
 using LiveCharts.Defaults;
 using LiveCharts.Wpf;
-using Objects.Models;
 using SeriesCollection = LiveCharts.SeriesCollection;
 
 namespace CodeBreaker

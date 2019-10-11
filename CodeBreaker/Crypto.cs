@@ -4,8 +4,8 @@ using System.Linq;
 using System.Security.Cryptography;
 using Alea;
 using Alea.Parallel;
+using CodeBreaker.Models;
 using Extreme.Mathematics;
-using Objects.Models;
 
 namespace CodeBreaker
 {

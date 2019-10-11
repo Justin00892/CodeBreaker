@@ -3,7 +3,7 @@ using System.Linq;
 using Extreme.Mathematics;
 using Extreme.Statistics;
 
-namespace Objects.Models
+namespace CodeBreaker.Models
 {
     public class Stats
     {

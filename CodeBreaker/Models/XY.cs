@@ -30,14 +30,14 @@ namespace CodeBreaker.Models
 
             Console.WriteLine("\nN:");
             Console.WriteLine(n);
-            Console.WriteLine(string.Join("-",N.Reverse()));
+            //Console.WriteLine(string.Join("-",N.Reverse()));
             Console.WriteLine(BitConverter.ToString(N.Take(N.Length-1).Reverse().ToArray()));
-            Console.WriteLine(new BigInteger(N));
+            Console.WriteLine(new BigInteger(N.Take(N.Length-1).Concat(new byte[]{0x00}).ToArray()));
             Console.WriteLine("Tot:");
             Console.WriteLine(totient);
-            Console.WriteLine(string.Join("-",Totient.Reverse()));
+            //Console.WriteLine(string.Join("-",Totient.Reverse()));
             Console.WriteLine(BitConverter.ToString(Totient.Take(Totient.Length-1).Reverse().ToArray()));
-            Console.WriteLine(new BigInteger(Totient));
+            Console.WriteLine(new BigInteger(Totient.Take(Totient.Length-1).Concat(new byte[]{0x00}).ToArray()));
 
             for (var i = N.Length - 1; i >= 0; i--)
             {

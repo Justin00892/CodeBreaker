@@ -27,7 +27,7 @@ namespace CodeBreaker.Models
             Totient = totient.ToByteArray();
 
 
-
+            /*
             Console.WriteLine("\nN:");
             Console.WriteLine(n);
             //Console.WriteLine(string.Join("-",N.Reverse()));
@@ -38,6 +38,7 @@ namespace CodeBreaker.Models
             //Console.WriteLine(string.Join("-",Totient.Reverse()));
             Console.WriteLine(BitConverter.ToString(Totient.Take(Totient.Length-1).Reverse().ToArray()));
             Console.WriteLine(new BigInteger(Totient.Take(Totient.Length-1).Concat(new byte[]{0x00}).ToArray()));
+            */
 
             for (var i = N.Length - 1; i >= 0; i--)
             {
@@ -49,15 +50,19 @@ namespace CodeBreaker.Models
             NDynamic = N.Take(N.Length - Y - 1).ToArray();
             TotDynamic = Totient.Take(Totient.Length - Y - 1).ToArray();
 
+            /*
             Console.WriteLine("N:");
-            Console.WriteLine(BitConverter.ToString(NDynamic));
-            Console.WriteLine(new BigInteger(NDynamic));
+            Console.WriteLine(string.Join("-",NDynamic.Reverse()));
+            Console.WriteLine(BitConverter.ToString(NDynamic.Reverse().ToArray()));
+            Console.WriteLine(new BigInteger(NDynamic.Concat(new byte[] { 0x00 }).ToArray()));
             Console.WriteLine("Tot:");
-            Console.WriteLine(BitConverter.ToString(TotDynamic));
-            Console.WriteLine(new BigInteger(TotDynamic));
-
-            NDouble = double.Parse(new BigInteger(NDynamic).ToString());
-            TotDouble = double.Parse(new BigInteger(TotDynamic).ToString());
+            Console.WriteLine(string.Join("-", TotDynamic.Reverse()));
+            Console.WriteLine(BitConverter.ToString(TotDynamic.Reverse().ToArray()));
+            Console.WriteLine(new BigInteger(TotDynamic.Concat(new byte[] { 0x00 }).ToArray()));
+            */
+            
+            NDouble = double.Parse(new BigInteger(NDynamic.Concat(new byte[] { 0x00 }).ToArray()).ToString());
+            TotDouble = double.Parse(new BigInteger(TotDynamic.Concat(new byte[] { 0x00 }).ToArray()).ToString());
         }
 
 

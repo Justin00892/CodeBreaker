@@ -27,13 +27,13 @@ namespace CodeBreaker
             var mapper = Mappers.Xy<XY>()
                 .X(model => model.NDouble)
                 .Y(model => model.TotDouble)
-                .Fill(model => model.Y >= ChartValues.GroupBy(p => p.Y)
+                .Fill(model => model.Y == ChartValues.GroupBy(p => p.Y)
                         .OrderByDescending(gp => gp.Count()).Select(p => p.Key).FirstOrDefault()
                     ? new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 150, 0))
                     : model.Y < ChartValues.GroupBy(p => p.Y)
                         .OrderByDescending(gp => gp.Count()).Select(p => p.Key).FirstOrDefault()
                     ? new SolidColorBrush(System.Windows.Media.Color.FromRgb(200, 0, 0))
-                    : null);
+                    : new SolidColorBrush(System.Windows.Media.Color.FromRgb(200, 100, 0)));
             Charting.For<XY>(mapper);
 
             ChartValues = new ChartValues<XY>();
@@ -72,6 +72,7 @@ namespace CodeBreaker
                     Fill = Brushes.Transparent,
                     Stroke = new SolidColorBrush(System.Windows.Media.Color.FromRgb(200, 0, 0))
                 },
+                */
                 new LineSeries
                 {
                     Values = NToNValues,
@@ -93,7 +94,6 @@ namespace CodeBreaker
                     Fill = Brushes.Transparent,
                     Stroke = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 0, 0))
                 }
-                */
             };
             versusChart.DataClick += (sender, point) =>
             {

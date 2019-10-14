@@ -55,7 +55,7 @@ namespace CodeBreaker
                     {
                         var parameters = csp.ExportParameters(true);
                         var p = new BigInteger(parameters.P.FromBigEndian());
-                        var q = new BigInteger(parameters.Q.FromBigEndian());;
+                        var q = new BigInteger(parameters.Q.FromBigEndian());
                         var n = BigInteger.Multiply(p, q);
                         var tot = BigInteger.Multiply(p - 1, q - 1);
                         var xy = new XY(p, q, n, tot, i);

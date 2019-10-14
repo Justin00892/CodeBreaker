@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using Extreme.Mathematics;
 
 namespace CodeBreaker.Models
@@ -9,51 +10,71 @@ namespace CodeBreaker.Models
         public int X { get; }
         public int Y { get; }
 
-        private BigInteger P { get; }
-        private BigInteger Q { get; }
-        public BigInteger N { get; }
-        public BigInteger Totient { get; }
-        private BigInteger NDynamic { get; }
-        private BigInteger TotDynamic { get; }
-        public BigFloat Ratio { get; }
-        public double Diff { get; }
+        private byte[] P { get; }
+        private byte[] Q { get; }
+        public byte[] N { get; }
+        public byte[] Totient { get; }
+        public byte[] NDynamic { get; }
+        public byte[] TotDynamic { get; }
         public double NDouble { get; }
         public double TotDouble { get; }
-        public XY(BigInteger p, BigInteger q, BigInteger n, BigInteger totient, int x,int y)
+        public XY(BigInteger p, BigInteger q, BigInteger n, BigInteger totient, int x)
         {
             X = x;
-            Y = y;
-            N = n;
-            P = p;
-            Q = q;
-            Totient = totient;
-            Ratio = BigFloat.Divide(Totient, N);
-            Diff = double.Parse(BigInteger.Subtract(N, Totient).ToString());
-            NDynamic = BigInteger.Parse(N.ToString().Substring(Y));
-            TotDynamic = BigInteger.Parse(Totient.ToString().Substring(Y));
-            NDouble = double.Parse(NDynamic.ToString());
-            TotDouble = double.Parse(TotDynamic.ToString());
+            N = n.ToByteArray();
+            P = p.ToByteArray();
+            Q = q.ToByteArray();
+            Totient = totient.ToByteArray();
+
+
+
+            Console.WriteLine("\nN:");
+            Console.WriteLine(n);
+            Console.WriteLine(string.Join("-",N.Reverse()));
+            Console.WriteLine(BitConverter.ToString(N.Take(N.Length-1).Reverse().ToArray()));
+            Console.WriteLine(new BigInteger(N));
+            Console.WriteLine("Tot:");
+            Console.WriteLine(totient);
+            Console.WriteLine(string.Join("-",Totient.Reverse()));
+            Console.WriteLine(BitConverter.ToString(Totient.Take(Totient.Length-1).Reverse().ToArray()));
+            Console.WriteLine(new BigInteger(Totient));
+
+            for (var i = N.Length - 1; i >= 0; i--)
+            {
+                if (N[i] == Totient[i]) continue;
+                Y = i;
+                break;
+            }
+
+            NDynamic = N.Take(N.Length - Y - 1).ToArray();
+            TotDynamic = Totient.Take(Totient.Length - Y - 1).ToArray();
+
+            Console.WriteLine("N:");
+            Console.WriteLine(BitConverter.ToString(NDynamic));
+            Console.WriteLine(new BigInteger(NDynamic));
+            Console.WriteLine("Tot:");
+            Console.WriteLine(BitConverter.ToString(TotDynamic));
+            Console.WriteLine(new BigInteger(TotDynamic));
+
+            NDouble = double.Parse(new BigInteger(NDynamic).ToString());
+            TotDouble = double.Parse(new BigInteger(TotDynamic).ToString());
         }
 
-        public Tuple<double, int> GetDiffTuple()
-        {
-            var diffSplit = Diff.ToString(CultureInfo.InvariantCulture).Split('E');
-            return new Tuple<double, int>(double.Parse(diffSplit[0]), int.Parse(diffSplit[1]));
-        }
 
         public override string ToString()
         {
             return "\nKey Size: " + X +
-                   "\nP: " + P +
-                   "\nQ: " + Q +
+                   "\nP: " + string.Join("-", P) +
+                   "\nQ: " + string.Join("-", Q) +
                    "\nFull: " +
-                   "\n      N: " + N +
-                   "\nTotient: " + Totient +
+                   "\n      N: " + string.Join("-", N) +
+                   "\nTotient: " + string.Join("-", Totient) +
                    "\nShared Digits: " + Y +
                    "\nDynamic Portion: " +
-                   "\n  N: " + NDynamic +
-                   "\nTot: " + TotDynamic +
-                   "\nDifference: " + Diff;
+                   "\n  N: " + string.Join("-", NDynamic) +
+                   "\n     " + NDouble +
+                   "\nTot: " + string.Join("-", TotDynamic) +
+                   "\n     " + TotDouble;
         }
     }
 }

@@ -59,7 +59,7 @@ namespace CodeBreaker
                 _maxSize = (int)enteredMaxSize;
                 _minSize = (int) enteredMinSize;
                 _replicates = (int) replicatesBox.Value;
-                var points = await Task<List<XY>>.Factory.StartNew(() => Crypto.CompareNWithTotient(_minSize, _maxSize, _replicates, false));
+                var points = await Task<List<XY>>.Factory.StartNew(() => Crypto.CompareNWithTotient(_minSize, _maxSize, _replicates, true));
 
                 _data.AddPoints(points);
                 MakeGraph(points);

@@ -8,8 +8,6 @@ namespace CodeBreaker.Models
     public class Stats
     {
         public List<XY> Points { get; }
-        public BigFloat AverageRatio => BigFloat.Divide(Points.Sum(p => p.Ratio), Points.Count);
-        public double DiffFactor => Points.Average(p => (double)p.X / p.GetDiffTuple().Item2);
         public SimpleRegressionModel SigDigitsRegression => SigDigitsLinearRegression();
         public SimpleRegressionModel MinRangeRegression => MinRangeLinearRegression();
         public Stats()

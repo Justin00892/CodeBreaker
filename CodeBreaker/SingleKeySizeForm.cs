@@ -50,6 +50,7 @@ namespace CodeBreaker
                     Values = ChartValues,
                     PointGeometry = DefaultGeometries.Diamond
                 },
+                /*
                 new LineSeries
                 {
                     Values = RegressionValues,
@@ -92,7 +93,7 @@ namespace CodeBreaker
                     Fill = Brushes.Transparent,
                     Stroke = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 0, 0))
                 }
-
+                */
             };
             versusChart.DataClick += (sender, point) =>
             {

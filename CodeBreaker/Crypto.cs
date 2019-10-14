@@ -51,23 +51,16 @@ namespace CodeBreaker
             {
                 for (var x = 0; x < iterations; x++)
                 {
-                    var csp = new RSACryptoServiceProvider(i);
-                    var parameters = csp.ExportParameters(true);
-                    var p = FromBigEndian(parameters.P);
-                    //StorePrime(p,i);
-                    var q = FromBigEndian(parameters.Q);
-                    //StorePrime(q,i);
-                    var n = BigInteger.Multiply(p, q);
-                    
-                    if (points.Exists(point => BigInteger.Compare(point.N, n) == 0)) continue;
-
-                    var tot = BigInteger.Multiply(p - 1, q - 1);
-                    var nStr = n.ToString();
-                    var totStr = tot.ToString();
-                    var j = 0;
-                    for (; j < nStr.Length; j++) if (nStr[j] != totStr[j]) break;
-                    var xy = new XY(p, q, n, tot, i, j);
-                    points.Add(xy);
+                    using (var csp = new RSACryptoServiceProvider(i))
+                    {
+                        var parameters = csp.ExportParameters(true);
+                        var p = new BigInteger(parameters.P.FromBigEndian());
+                        var q = new BigInteger(parameters.Q.FromBigEndian());;
+                        var n = BigInteger.Multiply(p, q);
+                        var tot = BigInteger.Multiply(p - 1, q - 1);
+                        var xy = new XY(p, q, n, tot, i);
+                        points.Add(xy);
+                    }
                 }
             }
             
@@ -79,13 +72,12 @@ namespace CodeBreaker
                 var same = 0.0;
                 foreach (var xy in data.Points)
                 {
+                    /*
                     var expectedSigDigits = Math.Round(data.SigDigitsRegression.GetRegressionCurve().ValueAt(xy.X)-.5);
                     if (expectedSigDigits <= xy.Y)
                         same++;
                     var maxString = xy.N.ToString().Substring(xy.Y);
                     var totString = xy.Totient.ToString().Substring(xy.Y);
-
-                    var mag = (int)Math.Round((xy.X / data.DiffFactor) - 1);
 
                     var diff = new List<int>();
                     for (var i = 0; i < maxString.Length; i++)
@@ -95,18 +87,9 @@ namespace CodeBreaker
                         diff.Add(Math.Abs(nDigit - totDigit));
                     }
                     diffs.Add(diff);
+                    */
 
-                    Console.WriteLine("\nKey Size: " + xy.X);
-                    Console.WriteLine("Full: ");
-                    Console.WriteLine("      N: " + xy.N);
-                    Console.WriteLine("Totient: " + xy.Totient);
-                    Console.WriteLine("Predicted Shared Digits: " + expectedSigDigits);
-                    Console.WriteLine("Actual Shared Digits: " + xy.Y);
-                    Console.WriteLine("Dynamic Portion: ");
-                    Console.WriteLine("  N: " + maxString);
-                    Console.WriteLine("Tot: " + totString);
-                    Console.WriteLine("Estimated Diff Magnitude: " + mag);
-                    Console.WriteLine("Diff: " + xy.Diff);
+                    Console.WriteLine(xy.ToString());
                 }
                 Console.WriteLine("\nSample Size: " + data.Points.Count);
                 Console.WriteLine("Prediction Accuracy: " + same/data.Points.Count);
@@ -210,10 +193,10 @@ namespace CodeBreaker
         }
 
 
-        public static BigInteger FromBigEndian(byte[] p)
+        public static byte[] FromBigEndian(this byte[] p)
         {
             var q = p.Reverse().ToArray();
-            return new BigInteger((p[0] < 128 ? q : q.Concat(new byte[] { 0 })).ToArray());
+            return (p[0] < 128 ? q : q.Concat(new byte[] { 0 })).ToArray();
         }
 
         public static BigInteger ModInverse(this BigInteger a, BigInteger n)

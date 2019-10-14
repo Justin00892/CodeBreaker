@@ -43,16 +43,12 @@ namespace CodeBreaker
         {
             var csp = new RSACryptoServiceProvider(size);
             var parameters = csp.ExportParameters(true);
-            var p = Crypto.FromBigEndian(parameters.P);
-            var q = Crypto.FromBigEndian(parameters.Q);
+            var p = new BigInteger(parameters.P.FromBigEndian());
+            var q = new BigInteger(parameters.Q.FromBigEndian());
             
             var n = BigInteger.Multiply(p,q);
             var tot = BigInteger.Multiply(p - 1, q - 1);
             BigInteger e = 65537;
-            /*
-            do e = GetRandomBigInt(size);
-            while (1 >= e || e >= tot || BigInteger.GreatestCommonDivisor(e,tot) != 1);
-            */
             var d = e.ModInverse(tot);
 
             if (debug)

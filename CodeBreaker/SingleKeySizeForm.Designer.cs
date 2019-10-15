@@ -48,17 +48,19 @@
             this.controlPanel.Controls.Add(this.addButton);
             this.controlPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.controlPanel.Location = new System.Drawing.Point(0, 0);
+            this.controlPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.controlPanel.Name = "controlPanel";
-            this.controlPanel.Size = new System.Drawing.Size(800, 32);
+            this.controlPanel.Size = new System.Drawing.Size(1067, 39);
             this.controlPanel.TabIndex = 4;
             // 
             // continuousButton
             // 
             this.continuousButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.continuousButton.BackColor = System.Drawing.Color.Lime;
-            this.continuousButton.Location = new System.Drawing.Point(686, 3);
+            this.continuousButton.Location = new System.Drawing.Point(915, 4);
+            this.continuousButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.continuousButton.Name = "continuousButton";
-            this.continuousButton.Size = new System.Drawing.Size(102, 23);
+            this.continuousButton.Size = new System.Drawing.Size(136, 28);
             this.continuousButton.TabIndex = 5;
             this.continuousButton.Text = "Run Continuously";
             this.continuousButton.UseVisualStyleBackColor = false;
@@ -67,9 +69,10 @@
             // addButton
             // 
             this.addButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.addButton.Location = new System.Drawing.Point(598, 3);
+            this.addButton.Location = new System.Drawing.Point(797, 4);
+            this.addButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.addButton.Name = "addButton";
-            this.addButton.Size = new System.Drawing.Size(82, 23);
+            this.addButton.Size = new System.Drawing.Size(109, 28);
             this.addButton.TabIndex = 4;
             this.addButton.Text = "Add More";
             this.addButton.UseVisualStyleBackColor = true;
@@ -80,18 +83,20 @@
             this.graphTabPanel.Controls.Add(this.versusTab);
             this.graphTabPanel.Controls.Add(this.sizeTab);
             this.graphTabPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.graphTabPanel.Location = new System.Drawing.Point(0, 32);
+            this.graphTabPanel.Location = new System.Drawing.Point(0, 39);
+            this.graphTabPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.graphTabPanel.Name = "graphTabPanel";
             this.graphTabPanel.SelectedIndex = 0;
-            this.graphTabPanel.Size = new System.Drawing.Size(800, 471);
+            this.graphTabPanel.Size = new System.Drawing.Size(1067, 580);
             this.graphTabPanel.TabIndex = 5;
             // 
             // versusTab
             // 
             this.versusTab.Controls.Add(this.versusChart);
-            this.versusTab.Location = new System.Drawing.Point(4, 22);
+            this.versusTab.Location = new System.Drawing.Point(4, 25);
+            this.versusTab.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.versusTab.Name = "versusTab";
-            this.versusTab.Size = new System.Drawing.Size(792, 445);
+            this.versusTab.Size = new System.Drawing.Size(1059, 551);
             this.versusTab.TabIndex = 0;
             this.versusTab.Text = "N vs Totient";
             this.versusTab.UseVisualStyleBackColor = true;
@@ -101,18 +106,20 @@
             this.versusChart.BackColor = System.Drawing.Color.White;
             this.versusChart.Dock = System.Windows.Forms.DockStyle.Fill;
             this.versusChart.Location = new System.Drawing.Point(0, 0);
+            this.versusChart.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.versusChart.Name = "versusChart";
-            this.versusChart.Size = new System.Drawing.Size(792, 445);
+            this.versusChart.Size = new System.Drawing.Size(1059, 551);
             this.versusChart.TabIndex = 4;
             this.versusChart.Text = "Versus Chart";
             // 
             // sizeTab
             // 
             this.sizeTab.Controls.Add(this.sizeChart);
-            this.sizeTab.Location = new System.Drawing.Point(4, 22);
+            this.sizeTab.Location = new System.Drawing.Point(4, 25);
+            this.sizeTab.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.sizeTab.Name = "sizeTab";
-            this.sizeTab.Padding = new System.Windows.Forms.Padding(3);
-            this.sizeTab.Size = new System.Drawing.Size(792, 444);
+            this.sizeTab.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.sizeTab.Size = new System.Drawing.Size(1059, 551);
             this.sizeTab.TabIndex = 1;
             this.sizeTab.Text = "Size Distribution";
             this.sizeTab.UseVisualStyleBackColor = true;
@@ -120,19 +127,21 @@
             // sizeChart
             // 
             this.sizeChart.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.sizeChart.Location = new System.Drawing.Point(3, 3);
+            this.sizeChart.Location = new System.Drawing.Point(4, 4);
+            this.sizeChart.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.sizeChart.Name = "sizeChart";
-            this.sizeChart.Size = new System.Drawing.Size(786, 438);
+            this.sizeChart.Size = new System.Drawing.Size(1051, 543);
             this.sizeChart.TabIndex = 0;
             this.sizeChart.Text = "cartesianChart1";
             // 
             // SingleKeySizeForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 503);
+            this.ClientSize = new System.Drawing.Size(1067, 619);
             this.Controls.Add(this.graphTabPanel);
             this.Controls.Add(this.controlPanel);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "SingleKeySizeForm";
             this.Text = "SingleKeySizeForm";
             this.controlPanel.ResumeLayout(false);

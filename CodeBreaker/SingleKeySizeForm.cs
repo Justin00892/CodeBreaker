@@ -50,7 +50,6 @@ namespace CodeBreaker
                     Values = ChartValues,
                     PointGeometry = DefaultGeometries.Diamond
                 },
-                /*
                 new LineSeries
                 {
                     Values = RegressionValues,
@@ -72,7 +71,7 @@ namespace CodeBreaker
                     Fill = Brushes.Transparent,
                     Stroke = new SolidColorBrush(System.Windows.Media.Color.FromRgb(200, 0, 0))
                 },
-                */
+                /*
                 new LineSeries
                 {
                     Values = NToNValues,
@@ -80,6 +79,7 @@ namespace CodeBreaker
                     Fill = Brushes.Transparent,
                     Stroke = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 0, 200))
                 },
+                */
                 new LineSeries
                 {
                     Values = XAxis,
@@ -136,7 +136,7 @@ namespace CodeBreaker
         private async void AddButton_Click(object sender, EventArgs e)
         {
             addButton.Enabled = false;
-            var data = await Task<List<XY>>.Factory.StartNew(() => Crypto.CompareNWithTotient(_size, _size, 100, false));
+            var data = await Task<List<XY>>.Factory.StartNew(() => Crypto.CompareNWithTotient(_size, _size, 100, false,true));
             var newMax = data.Max(p => p.NDouble) > ChartValues.Max(p => p.NDouble);
             ChartValues.AddRange(data);
             CalculateRegression();

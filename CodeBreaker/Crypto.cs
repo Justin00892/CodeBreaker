@@ -43,7 +43,7 @@ namespace CodeBreaker
             return result;
         }
 
-        public static List<XY> CompareNWithTotient(int start, int stop, int iterations, bool debug)
+        public static List<XY> CompareNWithTotient(int start, int stop, int iterations, bool debug, bool addToDatabase)
         {
             
             var points = new List<XY>();
@@ -53,52 +53,43 @@ namespace CodeBreaker
                 {
                     using (var csp = new RSACryptoServiceProvider(i))
                     {
+                        var timestamp = DateTime.Now.ToUniversalTime();
                         var parameters = csp.ExportParameters(true);
                         var p = new BigInteger(parameters.P.FromBigEndian());
                         var q = new BigInteger(parameters.Q.FromBigEndian());
                         var n = BigInteger.Multiply(p, q);
                         var tot = BigInteger.Multiply(p - 1, q - 1);
-                        var xy = new XY(p, q, n, tot, i);
+                        var xy = new XY(p, q, n, tot, i,timestamp);
+
+                        //if(debug)xy.PrintForms();
+
                         points.Add(xy);
                     }
                 }
             }
-            
+
+            if (addToDatabase) AddToDatabase(points);
+
             if (debug)
             {
-                var data = new Stats();
-                data.AddPoints(points);
-                var diffs = new List<List<int>>();
-                var same = 0.0;
-                foreach (var xy in data.Points)
+                var results = new SortedDictionary<int, int>();
+                foreach (var point in points)
                 {
-                    /*
-                    var expectedSigDigits = Math.Round(data.SigDigitsRegression.GetRegressionCurve().ValueAt(xy.X)-.5);
-                    if (expectedSigDigits <= xy.Y)
-                        same++;
-                    var maxString = xy.N.ToString().Substring(xy.Y);
-                    var totString = xy.Totient.ToString().Substring(xy.Y);
-
-                    var diff = new List<int>();
-                    for (var i = 0; i < maxString.Length; i++)
+                    var r = Math.Abs(point.NDynamic.Last() - point.TotDynamic.Last());
+                    if (r > 2)
                     {
-                        var nDigit = int.Parse(maxString[i] + "");
-                        var totDigit = int.Parse(totString[i] + "");
-                        diff.Add(Math.Abs(nDigit - totDigit));
+                        Console.WriteLine("\n"+BitConverter.ToString(new []{point.NDynamic.Last()}));
+                        Console.WriteLine(BitConverter.ToString(new []{point.TotDynamic.Last()}));
+                        Console.WriteLine("Y: "+point.Y);
                     }
-                    diffs.Add(diff);
-                    */
 
-                    Console.WriteLine(xy.ToString());
+                    if (!results.ContainsKey(r))
+                        results[r] = 0;
+                    results[r]++;
                 }
-                Console.WriteLine("\nSample Size: " + data.Points.Count);
-                Console.WriteLine("Prediction Accuracy: " + same/data.Points.Count);
-                Console.WriteLine("First Digit Diffs:");
-                for (var i = 0; i < 10; i++)
-                    Console.WriteLine(i + ": " + diffs.Count(d => d[0] == i));
-                Console.WriteLine("First Digit Diff < 4: Second Digit Diffs:");
-                for (var i = 0; i < 10; i++)
-                    Console.WriteLine(i + ": " + diffs.Count(d => d[0] < 4 && d[1] == i));
+
+                foreach (var result in results)
+                    Console.WriteLine(result.Key + ": " + result.Value);
             }
 
             return points;
@@ -229,6 +220,15 @@ namespace CodeBreaker
             }
 
             return false;
+        }
+
+        private static async void AddToDatabase(List<XY> points)
+        {
+            using (var context = new PrimeContext())
+            {
+                context.Primes.AddRange(points);
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

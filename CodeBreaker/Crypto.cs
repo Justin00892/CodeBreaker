@@ -72,24 +72,27 @@ namespace CodeBreaker
 
             if (debug)
             {
-                var results = new SortedDictionary<int, int>();
-                foreach (var point in points)
+                foreach (var grouping in points.GroupBy(p => p.X))
                 {
-                    var r = Math.Abs(point.NDynamic.Last() - point.TotDynamic.Last());
-                    if (r > 2)
+                    Console.WriteLine("\n" + grouping.First().X);
+                    var results = new SortedDictionary<int, int>();
+                    foreach (var point in grouping)
                     {
-                        Console.WriteLine("\n"+BitConverter.ToString(new []{point.NDynamic.Last()}));
-                        Console.WriteLine(BitConverter.ToString(new []{point.TotDynamic.Last()}));
-                        Console.WriteLine("Y: "+point.Y);
-                    }
+                        Console.WriteLine();
 
-                    if (!results.ContainsKey(r))
-                        results[r] = 0;
-                    results[r]++;
+                        if (!results.ContainsKey(point.Y))
+                            results[point.Y] = 0;
+                        results[point.Y]++;
+                    }
+                    foreach (var result in results)
+                        Console.WriteLine(result.Key + ": " + result.Value);
+                    
                 }
 
-                foreach (var result in results)
-                    Console.WriteLine(result.Key + ": " + result.Value);
+                var data = new Stats();
+                data.AddPoints(points);
+                
+                Console.WriteLine(data.BytesRegression.GetPredictionInterval(start));
             }
 
             return points;
@@ -98,7 +101,7 @@ namespace CodeBreaker
         public static BigInteger GuessTotient(Stats data, BigInteger n, int keySize, BigInteger e, BigInteger realTotient, bool debug)
         {
             var totient = BigInteger.MinusOne;
-            var expectedSigDigits = (int)Math.Round(data.SigDigitsRegression.GetRegressionCurve().ValueAt(keySize) - .5);
+            var expectedSigDigits = (int)Math.Round(data.BytesRegression.GetRegressionCurve().ValueAt(keySize) - .5);
 
             var baseNString = n.ToString().Substring(0, expectedSigDigits);
             var dynamicNDouble = double.Parse(BigInteger.Parse(n.ToString().Substring(expectedSigDigits)).ToString());

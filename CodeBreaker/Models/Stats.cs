@@ -8,14 +8,14 @@ namespace CodeBreaker.Models
     public class Stats
     {
         public List<XY> Points { get; }
-        public SimpleRegressionModel SigDigitsRegression => SigDigitsLinearRegression();
+        public SimpleRegressionModel BytesRegression => BytesLinearRegression();
         public SimpleRegressionModel MinRangeRegression => MinRangeLinearRegression();
         public Stats()
         {
             Points = new List<XY>();
         }
 
-        private SimpleRegressionModel SigDigitsLinearRegression()
+        private SimpleRegressionModel BytesLinearRegression()
         {
             var x = Vector.Create(Points.Select(v => (double)v.X).ToArray());
             var y = Vector.Create(Points.Select(v => (double)v.Y).ToArray());

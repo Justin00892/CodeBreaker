@@ -59,7 +59,7 @@ namespace CodeBreaker
                 _maxSize = (int)enteredMaxSize;
                 _minSize = (int) enteredMinSize;
                 _replicates = (int) replicatesBox.Value;
-                var points = await Task<List<XY>>.Factory.StartNew(() => Crypto.CompareNWithTotient(_minSize, _maxSize, _replicates, true,false));
+                var points = await Task<List<XY>>.Factory.StartNew(() => Crypto.CompareNWithTotient(_minSize, _maxSize, _replicates, false,false));
 
                 _data.AddPoints(points);
                 MakeGraph(points);
@@ -108,14 +108,14 @@ namespace CodeBreaker
         private async void TestButton_Click(object sender, EventArgs e)
         {
             testButton.Enabled = false;
-            var keySize = 384;
+            var keySize = 424;
             var (publicKey, _, n, realTotient) = await Task<Tuple<BigInteger, BigInteger, BigInteger,BigInteger>>.Factory
                 .StartNew(() => RSA.GenerateKeys(keySize,false));
             //only for testing
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            var totientGuess = await Task<BigInteger>.Factory.StartNew(() => Crypto.GuessTotient(_data, n, keySize, publicKey, realTotient, false));
+            var totientGuess = await Task<byte[]>.Factory.StartNew(() => Crypto.GuessTotient(_data, n.ToByteArray(), keySize, publicKey.ToByteArray(), realTotient.ToByteArray(), false));
             stopwatch.Stop();
             Console.WriteLine(stopwatch.Elapsed);
             testButton.Enabled = true;

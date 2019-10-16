@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -92,79 +93,68 @@ namespace CodeBreaker
                 var data = new Stats();
                 data.AddPoints(points);
                 
-                Console.WriteLine(data.BytesRegression.GetPredictionInterval(start));
+                Console.WriteLine(data.BytesRegression().GetPredictionInterval(start));
             }
 
             return points;
         }
 
-        public static BigInteger GuessTotient(Stats data, BigInteger n, int keySize, BigInteger e, BigInteger realTotient, bool debug)
+        public static byte[] GuessTotient(Stats data, byte[] n, int keySize, byte[] e, byte[] realTot, bool debug)
         {
-            var totient = BigInteger.MinusOne;
-            var expectedSigDigits = (int)Math.Round(data.BytesRegression.GetRegressionCurve().ValueAt(keySize) - .5);
-
-            var baseNString = n.ToString().Substring(0, expectedSigDigits);
-            var dynamicNDouble = double.Parse(BigInteger.Parse(n.ToString().Substring(expectedSigDigits)).ToString());
-
-            //Remove this block after testing
-            var nStr = n.ToString();
-            var totStr = realTotient.ToString();
-            var actualShared = 0;
-            for (; actualShared < n.ToString().Length; actualShared++) if (nStr[actualShared] != totStr[actualShared]) break;
-            var target = BigInteger.Parse(realTotient.ToString().Substring(expectedSigDigits));
-
-            var interval = data.MinRangeRegression.GetPredictionInterval(dynamicNDouble, .99);
-            var min = interval.LowerBound < 0 ? 0 : new BigInteger(interval.LowerBound);
-            var max = new BigInteger(interval.UpperBound);
-
-            Console.WriteLine(interval);
-            Console.WriteLine("Number Of Logical Processors: {0}", Environment.ProcessorCount);
-
-            if (debug)
-            {
-                Console.WriteLine("\n      N: " + nStr.Substring(actualShared));
-                Console.WriteLine("Totient: " + totStr.Substring(actualShared));
-                Console.WriteLine("Predicted Shared: " + expectedSigDigits);
-                Console.WriteLine("Actual Shared: " + actualShared);
-                Console.WriteLine("Diff: " + double.Parse(BigInteger.Subtract(n, realTotient).ToString()));
-                //Console.WriteLine("Estimated Diff Magnitude: " + mag);
-                //Console.WriteLine(max >= target && target >= min);
-            }
-
-            var gpu = Gpu.Default;
-            var threadCount = gpu.Device.Cores;
-
-            var test = max.ToByteArray();
-            var test2 = new BigInteger(test);
-            var test3 = BigInteger.Compare(max, test2);
-
-            void Cyclic(int id)
-            {
-                
-                /*
-                for (var i = BigInteger.Add(min,id); i <= max; i += threadCount)
-                {
-                    if (BigInteger.Compare(i, target) != 0) continue;
-                    Console.WriteLine("Thread: " + id);
-                    Console.WriteLine("Totient: " + i);
-                    break;
-                }
-                */
-            }
-
-            gpu.For(0,threadCount,Cyclic);
-
             /*
-            Parallel.ForEach(BigIntSequenceReverse(min, max), (i, state) =>
+            var range = data.BytesRegression.GetPredictionInterval(keySize);
+            for (var i = Math.Floor(range.LowerBound); i <= Math.Ceiling(range.UpperBound); i++)
             {
                 Console.WriteLine(i);
-                if (BigInteger.Compare(i,target) != 0) return;
-                totient = i;
-                state.Break();
-            });
+            }
             */
+            var totient = n;
+            var minSharedBytes = (int)Math.Round(data.BytesRegression().GetPredictionInterval(keySize).LowerBound);
+            
+            var nStr = BitConverter.ToString(n.Take(n.Length - 1).Reverse().ToArray()).Split('-');
+            var totStr = BitConverter.ToString(realTot.Take(realTot.Length - 1).Reverse().ToArray()).Split('-');
+            var actualShared = 0;
+            for (var i = 0; i < nStr.Length; i++)
+            {
+                if (nStr[i] == totStr[i]) continue;
+                actualShared = i;
+                break;
+            }
 
-            return BigInteger.Parse(baseNString + totient);
+            Console.WriteLine(minSharedBytes);
+            Console.WriteLine(data.BytesRegression().GetPredictionInterval(keySize));
+            Console.WriteLine(actualShared);
+
+            var dynamicN = n.Take(n.Length - minSharedBytes - 1).ToArray();
+            Console.WriteLine("N");
+            Console.WriteLine(BitConverter.ToString(n.Take(n.Length-1).Reverse().ToArray()));
+            Console.WriteLine(BitConverter.ToString(dynamicN.Reverse().ToArray()));
+
+            //Remove block after testing
+            var target = realTot.Take(realTot.Length - minSharedBytes - 1).ToArray();
+            Console.WriteLine("Tot");
+            Console.WriteLine(BitConverter.ToString(realTot.Take(realTot.Length-1).Reverse().ToArray()));
+            Console.WriteLine(BitConverter.ToString(target.Reverse().ToArray()));
+
+            var nDouble = double.Parse(new BigInteger(dynamicN.Concat(new byte[] {0x00}).ToArray()).ToString());
+
+            Console.WriteLine("N (double): "+nDouble);
+            var interval = data.MinRangeRegression(keySize).GetPredictionInterval(nDouble, .99);
+            var min = new BigInteger(interval.LowerBound);
+            var minArray = min.ToByteArray();
+            var max = new BigInteger(interval.UpperBound);
+            var maxArray = max.ToByteArray();
+
+            var array = new List<byte>(minArray).ToArray();
+            while (true)
+            {
+                array.IterateByte(0x01,0);
+                Console.WriteLine(string.Join("-",array));
+            }
+            
+            
+
+            return totient;
         }
 
         private static IEnumerable<BigInteger> BigIntSequence(BigInteger min,BigInteger max)
@@ -215,14 +205,15 @@ namespace CodeBreaker
 
         private static bool IsPrime(BigInteger num)
         {
-            var numStr = num.ToString();
-            var lastChar = numStr[numStr.Length - 1];
-            if (new List<char>{'0','2','4','5','6','8'}.Contains(lastChar))
-            {
-                return false;
-            }
+            if (new BigInteger[] {0, 1, 2, 3, 5}.Contains(num)) return true;
+            return (num - 1) % 6 == 0 || (num - 5) % 6 == 0;
+        }
 
-            return false;
+        private static void IterateByte(this byte[] array, byte step, int start)
+        {
+            if(array[start] == 255)
+                array.IterateByte(0x01,start+1);
+            array[start]+=step;
         }
 
         private static async void AddToDatabase(List<XY> points)

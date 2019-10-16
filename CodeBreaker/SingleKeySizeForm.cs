@@ -26,17 +26,10 @@ namespace CodeBreaker
 
             var mapper = Mappers.Xy<XY>()
                 .X(model => model.NDouble)
-                .Y(model => model.TotDouble)
-                .Fill(model => model.Y == ChartValues.GroupBy(p => p.Y)
-                        .OrderByDescending(gp => gp.Count()).Select(p => p.Key).FirstOrDefault()
-                    ? new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 150, 0))
-                    : model.Y < ChartValues.GroupBy(p => p.Y)
-                        .OrderByDescending(gp => gp.Count()).Select(p => p.Key).FirstOrDefault()
-                    ? new SolidColorBrush(System.Windows.Media.Color.FromRgb(200, 0, 0))
-                    : new SolidColorBrush(System.Windows.Media.Color.FromRgb(200, 100, 0)));
+                .Y(model => model.TotDouble);
             Charting.For<XY>(mapper);
 
-            ChartValues = new ChartValues<XY>();
+            ChartValues = new Dictionary<int,ChartValues<XY>>();
             RegressionValues = new ChartValues<ObservablePoint>();
             UpperValues = new ChartValues<ObservablePoint>();
             LowerValues = new ChartValues<ObservablePoint>();
@@ -45,11 +38,6 @@ namespace CodeBreaker
             YAxis = new ChartValues<ObservablePoint>();
             versusChart.Series = new SeriesCollection
             {
-                new ScatterSeries
-                {
-                    Values = ChartValues,
-                    PointGeometry = DefaultGeometries.Diamond
-                },
                 new LineSeries
                 {
                     Values = RegressionValues,
@@ -71,7 +59,6 @@ namespace CodeBreaker
                     Fill = Brushes.Transparent,
                     Stroke = new SolidColorBrush(System.Windows.Media.Color.FromRgb(200, 0, 0))
                 },
-                /*
                 new LineSeries
                 {
                     Values = NToNValues,
@@ -79,7 +66,6 @@ namespace CodeBreaker
                     Fill = Brushes.Transparent,
                     Stroke = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 0, 200))
                 },
-                */
                 new LineSeries
                 {
                     Values = XAxis,
@@ -95,27 +81,21 @@ namespace CodeBreaker
                     Stroke = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 0, 0))
                 }
             };
+            
             versusChart.DataClick += (sender, point) =>
             {
-                var valuePoint = ChartValues.FirstOrDefault(v => v.NDouble == point.X && v.TotDouble == point.Y);
-                if (valuePoint != null)
-                {
-                    Console.WriteLine(valuePoint.ToString());
-                    Console.WriteLine("Range: " + _regression.GetPredictionInterval(valuePoint.NDouble,.99));
-                }
+                var instance = (XY) point.Instance;
+                Console.WriteLine(instance.ToString());
+                Console.WriteLine(_regression.GetPredictionInterval(point.X));
             };
+            
             versusChart.Zoom = ZoomingOptions.Xy;
             versusChart.DisableAnimations = true;
             versusChart.DataTooltip = null;
-            ChartValues.AddRange(points);
+
+            AddPoints(points);
 
             CalculateRegression();
-
-            graphTabPanel.SelectedIndexChanged += (sender, args) =>
-            {
-                if (graphTabPanel.SelectedIndex == 1)
-                    BuildHistogram();
-            };
 
             Timer = new Timer
             {
@@ -124,7 +104,7 @@ namespace CodeBreaker
             Timer.Tick += (sender, args) => addButton.PerformClick();
         }
 
-        private ChartValues<XY> ChartValues { get; }
+        private Dictionary<int,ChartValues<XY>> ChartValues { get; }
         private ChartValues<ObservablePoint> RegressionValues { get; }
         private ChartValues<ObservablePoint> UpperValues { get; }
         private ChartValues<ObservablePoint> LowerValues { get; }
@@ -136,18 +116,35 @@ namespace CodeBreaker
         private async void AddButton_Click(object sender, EventArgs e)
         {
             addButton.Enabled = false;
-            var data = await Task<List<XY>>.Factory.StartNew(() => Crypto.CompareNWithTotient(_size, _size, 100, false,true));
-            var newMax = data.Max(p => p.NDouble) > ChartValues.Max(p => p.NDouble);
-            ChartValues.AddRange(data);
+            var data = await Task<List<XY>>.Factory.StartNew(() => Crypto.CompareNWithTotient(_size, _size, 100, false,false));
+            AddPoints(data);
             CalculateRegression();
 
             addButton.Enabled = true;
         }
 
+        private void AddPoints(IEnumerable<XY> points)
+        {
+            foreach (var group in points.GroupBy(p => p.Y).OrderByDescending(g => g.Count()))
+            {
+                if (!ChartValues.ContainsKey(group.Key))
+                {
+                    ChartValues[group.Key] = new ChartValues<XY>();
+                    versusChart.Series.Add(new ScatterSeries
+                    {
+                        Values = ChartValues[group.Key],
+                        PointGeometry = DefaultGeometries.Diamond
+                    });
+                }
+                ChartValues[group.Key].AddRange(group.Select(g => g));
+            }
+        }
+
         private void CalculateRegression()
         {
-            var x = Vector.Create(ChartValues.Select(v => v.NDouble).ToArray());
-            var y = Vector.Create(ChartValues.Select(v => v.TotDouble).ToArray());
+            var values = ChartValues.OrderByDescending(d => d.Key).First().Value;
+            var x = Vector.Create(values.Select(v => v.NDouble).ToArray());
+            var y = Vector.Create(values.Select(v => v.TotDouble).ToArray());
             _regression = new SimpleRegressionModel(y, x);
             _regression.Fit();
 
@@ -158,13 +155,11 @@ namespace CodeBreaker
             XAxis.Clear();
             YAxis.Clear();
 
-            var max = ChartValues.Max(p => p.NDouble);
+            var max = values.Max(p => p.NDouble);
             XAxis.Add(new ObservablePoint(0, 0));
             XAxis.Add(new ObservablePoint(0, max));
             YAxis.Add(new ObservablePoint(0, 0));
             YAxis.Add(new ObservablePoint(max,0));
-
-
 
             NToNValues.Add(new ObservablePoint(0,0));
             NToNValues.Add(new ObservablePoint(max,max));
@@ -179,43 +174,25 @@ namespace CodeBreaker
             LowerValues.Add(new ObservablePoint(max, ci.LowerBound));
             RegressionValues.Add(new ObservablePoint(max, ci.Center));
 
-            var above = 0.0;
-            var below = 0.0;
-            foreach (var point in ChartValues)
+            var results = new SortedDictionary<int, int>();
+            foreach (var point in values)
             {
-                var interval = _regression.GetPredictionInterval(point.NDouble, .99);
-                if (point.TotDouble <= interval.UpperBound && point.TotDouble > interval.Center)
-                    above++;
-                else if(point.TotDouble <= interval.Center && point.TotDouble >= interval.LowerBound)
-                    below++;
-            }
-            Console.WriteLine("Above Center: " + above/ChartValues.Count);
-            Console.WriteLine("Below Center: " + below/ChartValues.Count);
-        }
-
-        private void BuildHistogram()
-        {
-            var max = Math.Ceiling(ChartValues.Max(p => p.TotDouble));
-            var min = Math.Floor(ChartValues.Min(p => p.TotDouble));
-            var binSize = max / 100;
-
-            var histValues = new Dictionary<string,int>();
-            for (var i = min; i < max; i += binSize)
-                histValues.Add(i + " - " + (i + binSize), ChartValues.Count(v => v.TotDouble > i && v.TotDouble <= i + binSize));
-
-            sizeChart.Series.Clear();
-            sizeChart.AxisY.Clear();
-            sizeChart.Series = new SeriesCollection
-            {
-                new RowSeries
+                var range = _regression.GetPredictionInterval(point.NDouble);
+                var r = new List<Tuple<int,double>>
                 {
-                    Values = new ChartValues<int>(histValues.Values)
-                }
-            };
-            sizeChart.AxisY.Add(new Axis
-            {
-                Labels = histValues.Keys.ToList()
-            });
+                    new Tuple<int, double>(1,Math.Abs(range.UpperBound - point.TotDouble)), 
+                    new Tuple<int, double>(2,Math.Abs(range.Center - point.TotDouble)),
+                    new Tuple<int, double>(3,Math.Abs(range.LowerBound - point.TotDouble))
+                }.OrderBy(n => n.Item2).First();
+
+                if (!results.ContainsKey(r.Item1))
+                    results[r.Item1] = 0;
+                results[r.Item1]++;
+            }
+
+            foreach (var result in results)
+                Console.WriteLine(result.Key +": "+result.Value);
+            
         }
 
         private void ContinuousButton_Click(object sender, EventArgs e)

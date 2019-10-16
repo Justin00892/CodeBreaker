@@ -33,19 +33,6 @@ namespace CodeBreaker.Models
             Totient = totient.ToByteArray();
             Timestamp = timestamp;
 
-            /*
-            Console.WriteLine("\nN:");
-            Console.WriteLine(n);
-            //Console.WriteLine(string.Join("-",N.Reverse()));
-            Console.WriteLine(BitConverter.ToString(N.Take(N.Length-1).Reverse().ToArray()));
-            Console.WriteLine(new BigInteger(N.Take(N.Length-1).Concat(new byte[]{0x00}).ToArray()));
-            Console.WriteLine("Tot:");
-            Console.WriteLine(totient);
-            //Console.WriteLine(string.Join("-",Totient.Reverse()));
-            Console.WriteLine(BitConverter.ToString(Totient.Take(Totient.Length-1).Reverse().ToArray()));
-            Console.WriteLine(new BigInteger(Totient.Take(Totient.Length-1).Concat(new byte[]{0x00}).ToArray()));
-            */
-
             var nStr = BitConverter.ToString(N.Take(N.Length - 1).Reverse().ToArray()).Split('-');
             var totStr = BitConverter.ToString(Totient.Take(N.Length - 1).Reverse().ToArray()).Split('-');
 
@@ -60,6 +47,17 @@ namespace CodeBreaker.Models
             TotDynamic = Totient.Take(Totient.Length - Y - 1).ToArray();
             NDouble = double.Parse(new BigInteger(NDynamic.Concat(new byte[] { 0x00 }).ToArray()).ToString());
             TotDouble = double.Parse(new BigInteger(TotDynamic.Concat(new byte[] { 0x00 }).ToArray()).ToString());
+
+            /*
+            Console.WriteLine("N");
+            Console.WriteLine(BitConverter.ToString(N.Take(N.Length-1).Reverse().ToArray()));
+            Console.WriteLine(BitConverter.ToString(NDynamic.Take(NDynamic.Length).Reverse().ToArray()));
+            Console.WriteLine(new BigInteger(NDynamic.Concat(new byte[] { 0x00 }).ToArray()).ToString());
+            Console.WriteLine("Tot");
+            Console.WriteLine(BitConverter.ToString(Totient.Take(Totient.Length-1).Reverse().ToArray()));
+            Console.WriteLine(BitConverter.ToString(TotDynamic.Take(TotDynamic.Length).Reverse().ToArray()));
+            Console.WriteLine(new BigInteger(TotDynamic.Concat(new byte[] { 0x00 }).ToArray()).ToString());
+            */
         }
 
         public void PrintForms()
@@ -93,6 +91,16 @@ namespace CodeBreaker.Models
                    "\n     " + NDouble +
                    "\nTot: " + string.Join("-", TotDynamic) +
                    "\n     " + TotDouble;
+        }
+
+        public double GetNDouble(int bytes)
+        {
+            return double.Parse(new BigInteger(N.Take(N.Length - bytes - 1).Concat(new byte[] { 0x00 }).ToArray()).ToString());
+        }
+
+        public double GetTotDouble(int bytes)
+        {
+            return double.Parse(new BigInteger(Totient.Take(Totient.Length - bytes - 1).Concat(new byte[] { 0x00 }).ToArray()).ToString());
         }
     }
 }

@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
-using Alea;
-using Alea.Parallel;
+using System.Threading;
+using System.Threading.Tasks;
 using CodeBreaker.Models;
 using Extreme.Mathematics;
 
@@ -144,15 +143,81 @@ namespace CodeBreaker
             var minArray = min.ToByteArray();
             var max = new BigInteger(interval.UpperBound);
             var maxArray = max.ToByteArray();
+            var mid = new BigInteger(interval.Center);
+            var midArray = mid.ToByteArray();
 
-            var array = new List<byte>(minArray).ToArray();
-            while (true)
+            var num_threads = Environment.ProcessorCount;
+            var result = new byte[midArray.Length];
+            var lck = new object();
+            var cts = new CancellationTokenSource();
+            var tasks = new List<Task>(num_threads);
+
+            var minDiff = BigInteger.Divide(min, num_threads/2);
+            var maxDiff = BigInteger.Divide(max, num_threads/2);
+            var range = new List<byte[]>();
+            for (var i = 0; i < num_threads/2; i++)
             {
-                array.IterateByte(0x01,0);
-                Console.WriteLine(string.Join("-",array));
+                range.Add(BigInteger.Add(mid,BigInteger.Multiply(maxDiff,i)).ToByteArray());
+                range.Add(BigInteger.Subtract(mid,BigInteger.Multiply(minDiff,i)).ToByteArray());
             }
-            
-            
+
+            for (var x = 0; x < num_threads; x++)
+            {
+                if (x % 2 == 0)
+                {
+                    tasks[x] = Task.Factory.StartNew(m =>
+                    {
+                        var array = new List<byte>((byte[])m).ToArray();
+                        while (true)
+                        {
+                            /*
+                            try
+                            {
+                                array.IterateByteUp(0x02, 0);
+                                //Console.WriteLine(BitConverter.ToString(array.Reverse().ToArray()));
+                                if (!array.SequenceEqual(target) && !array.SequenceEqual(maxArray)) continue;
+                                lock (lck) result = array;
+                                cts.Cancel();
+                            }
+                            catch (Exception)
+                            {
+                                break;
+                            }
+                            */
+                        }
+                    },range[x], cts.Token);
+                    Console.WriteLine("Task "+ x + " started");
+                }
+                else
+                {
+                    tasks[x] = Task.Factory.StartNew(m =>
+                    {
+                        var array = new List<byte>((byte[])m).ToArray();
+                        while (true)
+                        {
+                            /*
+                            try
+                            {
+                                array.IterateByteDown(0x02, 0);
+                                //Console.WriteLine(BitConverter.ToString(array.Reverse().ToArray()));
+                                if (!array.SequenceEqual(target) && !array.SequenceEqual(minArray)) continue;
+                                lock (lck) result = array;
+                                cts.Cancel();
+                            }
+                            catch (Exception)
+                            {
+                                break;
+                            }
+                            */
+                        }
+                    },range[x], cts.Token);
+                    Console.WriteLine("Task "+ x + " started");
+                }
+            }
+
+            Task.WaitAll(tasks.ToArray());
+            Console.WriteLine(BitConverter.ToString(result.Reverse().ToArray()));
+
 
             return totient;
         }
@@ -175,14 +240,11 @@ namespace CodeBreaker
                 bi -= 2;     
             }
         }
-
-
         public static byte[] FromBigEndian(this byte[] p)
         {
             var q = p.Reverse().ToArray();
             return (p[0] < 128 ? q : q.Concat(new byte[] { 0 })).ToArray();
         }
-
         public static BigInteger ModInverse(this BigInteger a, BigInteger n)
         {
             var i = n;
@@ -202,18 +264,25 @@ namespace CodeBreaker
             if (v<0) v = (v+n)%n;
             return v;
         }
-
         private static bool IsPrime(BigInteger num)
         {
             if (new BigInteger[] {0, 1, 2, 3, 5}.Contains(num)) return true;
             return (num - 1) % 6 == 0 || (num - 5) % 6 == 0;
         }
 
-        private static void IterateByte(this byte[] array, byte step, int start)
+        private static void IterateByteUp(this byte[] array, byte step, int start)
         {
-            if(array[start] == 255)
-                array.IterateByte(0x01,start+1);
+            if (array.All(b => b == 0xff)) throw new Exception("max reached");
+            if(array[start] >= 256-step)
+                array.IterateByteUp(0x01,start+1);
             array[start]+=step;
+        }
+        private static void IterateByteDown(this byte[] array, byte step, int start)
+        {
+            if (array.All(b => b == 0x00)) throw new Exception("min reached");
+            if(array[start] <= 0+step)
+                array.IterateByteDown(0x01,start+1);
+            array[start]-=step;
         }
 
         private static async void AddToDatabase(List<XY> points)

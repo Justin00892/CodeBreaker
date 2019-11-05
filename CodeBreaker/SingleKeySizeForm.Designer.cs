@@ -34,12 +34,12 @@
             this.graphTabPanel = new System.Windows.Forms.TabControl();
             this.versusTab = new System.Windows.Forms.TabPage();
             this.versusChart = new LiveCharts.WinForms.CartesianChart();
-            this.sizeTab = new System.Windows.Forms.TabPage();
-            this.sizeChart = new LiveCharts.WinForms.CartesianChart();
+            this.polarTab = new System.Windows.Forms.TabPage();
+            this.polarChart = new LiveCharts.WinForms.CartesianChart();
             this.controlPanel.SuspendLayout();
             this.graphTabPanel.SuspendLayout();
             this.versusTab.SuspendLayout();
-            this.sizeTab.SuspendLayout();
+            this.polarTab.SuspendLayout();
             this.SuspendLayout();
             // 
             // controlPanel
@@ -48,7 +48,7 @@
             this.controlPanel.Controls.Add(this.addButton);
             this.controlPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.controlPanel.Location = new System.Drawing.Point(0, 0);
-            this.controlPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.controlPanel.Margin = new System.Windows.Forms.Padding(4);
             this.controlPanel.Name = "controlPanel";
             this.controlPanel.Size = new System.Drawing.Size(1067, 39);
             this.controlPanel.TabIndex = 4;
@@ -58,7 +58,7 @@
             this.continuousButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.continuousButton.BackColor = System.Drawing.Color.Lime;
             this.continuousButton.Location = new System.Drawing.Point(915, 4);
-            this.continuousButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.continuousButton.Margin = new System.Windows.Forms.Padding(4);
             this.continuousButton.Name = "continuousButton";
             this.continuousButton.Size = new System.Drawing.Size(136, 28);
             this.continuousButton.TabIndex = 5;
@@ -70,7 +70,7 @@
             // 
             this.addButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.addButton.Location = new System.Drawing.Point(797, 4);
-            this.addButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.addButton.Margin = new System.Windows.Forms.Padding(4);
             this.addButton.Name = "addButton";
             this.addButton.Size = new System.Drawing.Size(109, 28);
             this.addButton.TabIndex = 4;
@@ -81,10 +81,10 @@
             // graphTabPanel
             // 
             this.graphTabPanel.Controls.Add(this.versusTab);
-            this.graphTabPanel.Controls.Add(this.sizeTab);
+            this.graphTabPanel.Controls.Add(this.polarTab);
             this.graphTabPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.graphTabPanel.Location = new System.Drawing.Point(0, 39);
-            this.graphTabPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.graphTabPanel.Margin = new System.Windows.Forms.Padding(4);
             this.graphTabPanel.Name = "graphTabPanel";
             this.graphTabPanel.SelectedIndex = 0;
             this.graphTabPanel.Size = new System.Drawing.Size(1067, 580);
@@ -94,7 +94,7 @@
             // 
             this.versusTab.Controls.Add(this.versusChart);
             this.versusTab.Location = new System.Drawing.Point(4, 25);
-            this.versusTab.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.versusTab.Margin = new System.Windows.Forms.Padding(4);
             this.versusTab.Name = "versusTab";
             this.versusTab.Size = new System.Drawing.Size(1059, 551);
             this.versusTab.TabIndex = 0;
@@ -106,33 +106,32 @@
             this.versusChart.BackColor = System.Drawing.Color.White;
             this.versusChart.Dock = System.Windows.Forms.DockStyle.Fill;
             this.versusChart.Location = new System.Drawing.Point(0, 0);
-            this.versusChart.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.versusChart.Margin = new System.Windows.Forms.Padding(4);
             this.versusChart.Name = "versusChart";
             this.versusChart.Size = new System.Drawing.Size(1059, 551);
             this.versusChart.TabIndex = 4;
             this.versusChart.Text = "Versus Chart";
             // 
-            // sizeTab
+            // polarTab
             // 
-            this.sizeTab.Controls.Add(this.sizeChart);
-            this.sizeTab.Location = new System.Drawing.Point(4, 25);
-            this.sizeTab.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.sizeTab.Name = "sizeTab";
-            this.sizeTab.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.sizeTab.Size = new System.Drawing.Size(1059, 551);
-            this.sizeTab.TabIndex = 1;
-            this.sizeTab.Text = "Size Distribution";
-            this.sizeTab.UseVisualStyleBackColor = true;
+            this.polarTab.Controls.Add(this.polarChart);
+            this.polarTab.Location = new System.Drawing.Point(4, 25);
+            this.polarTab.Margin = new System.Windows.Forms.Padding(4);
+            this.polarTab.Name = "polarTab";
+            this.polarTab.Padding = new System.Windows.Forms.Padding(4);
+            this.polarTab.Size = new System.Drawing.Size(1059, 551);
+            this.polarTab.TabIndex = 1;
+            this.polarTab.Text = "Polar";
+            this.polarTab.UseVisualStyleBackColor = true;
             // 
-            // sizeChart
+            // polarChart
             // 
-            this.sizeChart.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.sizeChart.Location = new System.Drawing.Point(4, 4);
-            this.sizeChart.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.sizeChart.Name = "sizeChart";
-            this.sizeChart.Size = new System.Drawing.Size(1051, 543);
-            this.sizeChart.TabIndex = 0;
-            this.sizeChart.Text = "cartesianChart1";
+            this.polarChart.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.polarChart.Location = new System.Drawing.Point(4, 4);
+            this.polarChart.Margin = new System.Windows.Forms.Padding(4);
+            this.polarChart.Name = "polarChart";
+            this.polarChart.Size = new System.Drawing.Size(1051, 543);
+            this.polarChart.TabIndex = 0;
             // 
             // SingleKeySizeForm
             // 
@@ -141,13 +140,13 @@
             this.ClientSize = new System.Drawing.Size(1067, 619);
             this.Controls.Add(this.graphTabPanel);
             this.Controls.Add(this.controlPanel);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "SingleKeySizeForm";
             this.Text = "SingleKeySizeForm";
             this.controlPanel.ResumeLayout(false);
             this.graphTabPanel.ResumeLayout(false);
             this.versusTab.ResumeLayout(false);
-            this.sizeTab.ResumeLayout(false);
+            this.polarTab.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -158,8 +157,8 @@
         private System.Windows.Forms.TabControl graphTabPanel;
         private System.Windows.Forms.TabPage versusTab;
         private LiveCharts.WinForms.CartesianChart versusChart;
-        private System.Windows.Forms.TabPage sizeTab;
-        private LiveCharts.WinForms.CartesianChart sizeChart;
+        private System.Windows.Forms.TabPage polarTab;
+        private LiveCharts.WinForms.CartesianChart polarChart;
         private System.Windows.Forms.Button continuousButton;
     }
 }

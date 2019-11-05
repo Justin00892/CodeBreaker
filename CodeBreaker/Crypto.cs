@@ -72,14 +72,14 @@ namespace CodeBreaker
 
             if (debug)
             {
+                var data = new Stats();
+                data.AddPoints(points);
                 foreach (var grouping in points.GroupBy(p => p.X))
                 {
                     Console.WriteLine("\n" + grouping.First().X);
                     var results = new SortedDictionary<int, int>();
                     foreach (var point in grouping)
                     {
-                        Console.WriteLine();
-
                         if (!results.ContainsKey(point.Y))
                             results[point.Y] = 0;
                         results[point.Y]++;
@@ -87,12 +87,8 @@ namespace CodeBreaker
                     foreach (var result in results)
                         Console.WriteLine(result.Key + ": " + result.Value);
                     
+                    Console.WriteLine(data.BytesRegression.GetPredictionInterval(grouping.First().X));
                 }
-
-                var data = new Stats();
-                data.AddPoints(points);
-                
-                Console.WriteLine(data.BytesRegression.GetPredictionInterval(start));
             }
 
             return points;

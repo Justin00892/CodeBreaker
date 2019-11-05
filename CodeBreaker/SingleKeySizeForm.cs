@@ -34,7 +34,6 @@ namespace CodeBreaker
                         .OrderByDescending(gp => gp.Count()).Select(p => p.Key).FirstOrDefault()
                     ? new SolidColorBrush(System.Windows.Media.Color.FromRgb(200, 0, 0))
                     : new SolidColorBrush(System.Windows.Media.Color.FromRgb(200, 100, 0)));
-            Charting.For<XY>(mapper);
 
             ChartValues = new ChartValues<XY>();
             RegressionValues = new ChartValues<ObservablePoint>();
@@ -43,7 +42,7 @@ namespace CodeBreaker
             NToNValues = new ChartValues<ObservablePoint>();
             XAxis = new ChartValues<ObservablePoint>();
             YAxis = new ChartValues<ObservablePoint>();
-            versusChart.Series = new SeriesCollection
+            versusChart.Series = new SeriesCollection(mapper)
             {
                 new ScatterSeries
                 {
@@ -114,7 +113,7 @@ namespace CodeBreaker
             graphTabPanel.SelectedIndexChanged += (sender, args) =>
             {
                 if (graphTabPanel.SelectedIndex == 1)
-                    BuildHistogram();
+                    BuildPolar();
             };
 
             Timer = new Timer
@@ -193,29 +192,30 @@ namespace CodeBreaker
             Console.WriteLine("Below Center: " + below/ChartValues.Count);
         }
 
-        private void BuildHistogram()
+        private void BuildPolar()
         {
-            var max = Math.Ceiling(ChartValues.Max(p => p.TotDouble));
-            var min = Math.Floor(ChartValues.Min(p => p.TotDouble));
-            var binSize = max / 100;
+            var polarMapper = Mappers.Polar<XY>()
+                .Radius(model => model.NDouble)
+                .Angle(model => model.TotDouble)
+                .Fill(model => model.Y == ChartValues.GroupBy(p => p.Y)
+                                   .OrderByDescending(gp => gp.Count()).Select(p => p.Key).FirstOrDefault()
+                    ? new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 150, 0))
+                    : model.Y < ChartValues.GroupBy(p => p.Y)
+                          .OrderByDescending(gp => gp.Count()).Select(p => p.Key).FirstOrDefault()
+                        ? new SolidColorBrush(System.Windows.Media.Color.FromRgb(200, 0, 0))
+                        : new SolidColorBrush(System.Windows.Media.Color.FromRgb(200, 100, 0)));
 
-            var histValues = new Dictionary<string,int>();
-            for (var i = min; i < max; i += binSize)
-                histValues.Add(i + " - " + (i + binSize), ChartValues.Count(v => v.TotDouble > i && v.TotDouble <= i + binSize));
-
-            sizeChart.Series.Clear();
-            sizeChart.AxisY.Clear();
-            sizeChart.Series = new SeriesCollection
+            polarChart.Series = new SeriesCollection(polarMapper)
             {
-                new RowSeries
+                new ScatterSeries
                 {
-                    Values = new ChartValues<int>(histValues.Values)
+                    Values = ChartValues,
+                    PointGeometry = DefaultGeometries.Circle
                 }
             };
-            sizeChart.AxisY.Add(new Axis
-            {
-                Labels = histValues.Keys.ToList()
-            });
+            polarChart.Zoom = ZoomingOptions.Xy;
+            polarChart.DisableAnimations = true;
+            polarChart.DataTooltip = null;
         }
 
         private void ContinuousButton_Click(object sender, EventArgs e)

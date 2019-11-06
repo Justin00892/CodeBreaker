@@ -12,6 +12,7 @@ namespace GPUBinaryTest
         {
             Console.ForegroundColor = ConsoleColor.Green;
 
+            /*
             var results = new SortedDictionary<int, int>();
             for (var x = 0; x < 1000; x++)
             {
@@ -50,23 +51,24 @@ namespace GPUBinaryTest
             foreach (var result in results)
                 Console.WriteLine(result.Key +": "+result.Value);
 
-
+            */
             var target = BigInteger.Parse("256553263330763623874525398232939879603778600288284963502959397").ToByteArray();
+            Console.WriteLine(BitConverter.ToString(target.Reverse().ToArray()));
             var array = new byte[target.Length];
             for (var i = 0; i < array.Length; i++)
                 array[i] = new byte();
 
-            while(array.GetHashCode() != target.GetHashCode())
+            array.IterateByte(0x01,0);
+            while(true)
             {
-                array.IterateByte(0x02,array.Length-1);
-                Console.WriteLine(string.Join("",BitConverter.ToString(array).Replace("-","").SkipWhile(c => c == '0')));
+                array.IterateByte(0x02,0);
+                Console.WriteLine(BitConverter.ToString(array.Reverse().ToArray()));
             }
         }
-
         private static void IterateByte(this byte[] array, byte step, int start)
         {
-            if(array[start] == 255-(step-1))
-                array.IterateByte(0x01,start - 1);
+            if(array[start] >= 256-step)
+                array.IterateByte(0x01,start+1);
             array[start]+=step;
         }
 

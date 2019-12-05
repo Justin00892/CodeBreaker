@@ -26,14 +26,7 @@ namespace CodeBreaker
 
             var mapper = Mappers.Xy<XY>()
                 .X(model => model.NDouble)
-                .Y(model => model.TotDouble)
-                .Fill(model => model.Y == ChartValues.GroupBy(p => p.Y)
-                        .OrderByDescending(gp => gp.Count()).Select(p => p.Key).FirstOrDefault()
-                    ? new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 150, 0))
-                    : model.Y < ChartValues.GroupBy(p => p.Y)
-                        .OrderByDescending(gp => gp.Count()).Select(p => p.Key).FirstOrDefault()
-                    ? new SolidColorBrush(System.Windows.Media.Color.FromRgb(200, 0, 0))
-                    : new SolidColorBrush(System.Windows.Media.Color.FromRgb(200, 100, 0)));
+                .Y(model => model.TotDouble);
 
             ChartValues = new Dictionary<int,ChartValues<XY>>();
             RegressionValues = new ChartValues<ObservablePoint>();
@@ -99,15 +92,19 @@ namespace CodeBreaker
             versusChart.DisableAnimations = true;
             versusChart.DataTooltip = null;
 
+            //Polar chart
+            var polarMapper = Mappers.Polar<XY>()
+                .Radius(model => model.NDouble)
+                .Angle(model => model.TotDouble);
+
+            polarChart.Series = new SeriesCollection(polarMapper);
+
+            polarChart.Zoom = ZoomingOptions.Xy;
+            polarChart.DisableAnimations = true;
+            polarChart.DataTooltip = null;
+
             AddPoints(points);
-
             CalculateRegression();
-
-            graphTabPanel.SelectedIndexChanged += (sender, args) =>
-            {
-                if (graphTabPanel.SelectedIndex == 1)
-                    BuildPolar();
-            };
 
             Timer = new Timer
             {
@@ -147,6 +144,11 @@ namespace CodeBreaker
                         Values = ChartValues[group.Key],
                         PointGeometry = DefaultGeometries.Diamond
                     });
+                    polarChart.Series.Add(new ScatterSeries
+                    {
+                        Values = ChartValues[group.Key],
+                        PointGeometry = DefaultGeometries.Circle
+                    });
                 }
                 ChartValues[group.Key].AddRange(group.Select(g => g));
             }
@@ -171,10 +173,10 @@ namespace CodeBreaker
             XAxis.Add(new ObservablePoint(0, 0));
             XAxis.Add(new ObservablePoint(0, max));
             YAxis.Add(new ObservablePoint(0, 0));
-            YAxis.Add(new ObservablePoint(max,0));
+            YAxis.Add(new ObservablePoint(max, 0));
 
-            NToNValues.Add(new ObservablePoint(0,0));
-            NToNValues.Add(new ObservablePoint(max,max));
+            NToNValues.Add(new ObservablePoint(0, 0));
+            NToNValues.Add(new ObservablePoint(max, max));
 
             var ci = _regression.GetPredictionInterval(0, .99);
             UpperValues.Add(new ObservablePoint(0, ci.UpperBound));
@@ -190,42 +192,22 @@ namespace CodeBreaker
             foreach (var point in values)
             {
                 var range = _regression.GetPredictionInterval(point.NDouble);
-                var r = new List<Tuple<int,double>>
+                var r = new List<Tuple<int, double>>
                 {
-                    new Tuple<int, double>(1,Math.Abs(range.UpperBound - point.TotDouble)), 
-                    new Tuple<int, double>(2,Math.Abs(range.Center - point.TotDouble)),
-                    new Tuple<int, double>(3,Math.Abs(range.LowerBound - point.TotDouble))
+                    new Tuple<int, double>(1, Math.Abs(range.UpperBound - point.TotDouble)),
+                    new Tuple<int, double>(2, Math.Abs(range.Center - point.TotDouble)),
+                    new Tuple<int, double>(3, Math.Abs(range.LowerBound - point.TotDouble))
                 }.OrderBy(n => n.Item2).First();
 
                 if (!results.ContainsKey(r.Item1))
                     results[r.Item1] = 0;
                 results[r.Item1]++;
             }
+        }
 
         private void BuildPolar()
         {
-            var polarMapper = Mappers.Polar<XY>()
-                .Radius(model => model.NDouble)
-                .Angle(model => model.TotDouble)
-                .Fill(model => model.Y == ChartValues.GroupBy(p => p.Y)
-                                   .OrderByDescending(gp => gp.Count()).Select(p => p.Key).FirstOrDefault()
-                    ? new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 150, 0))
-                    : model.Y < ChartValues.GroupBy(p => p.Y)
-                          .OrderByDescending(gp => gp.Count()).Select(p => p.Key).FirstOrDefault()
-                        ? new SolidColorBrush(System.Windows.Media.Color.FromRgb(200, 0, 0))
-                        : new SolidColorBrush(System.Windows.Media.Color.FromRgb(200, 100, 0)));
-
-            polarChart.Series = new SeriesCollection(polarMapper)
-            {
-                new ScatterSeries
-                {
-                    Values = ChartValues,
-                    PointGeometry = DefaultGeometries.Circle
-                }
-            };
-            polarChart.Zoom = ZoomingOptions.Xy;
-            polarChart.DisableAnimations = true;
-            polarChart.DataTooltip = null;
+            
         }
 
         private void ContinuousButton_Click(object sender, EventArgs e)

@@ -87,7 +87,7 @@ namespace CodeBreaker
                     foreach (var result in results)
                         Console.WriteLine(result.Key + ": " + result.Value);
                     
-                    Console.WriteLine(data.BytesRegression.GetPredictionInterval(grouping.First().X));
+                    Console.WriteLine(data.BytesRegression().GetPredictionInterval(grouping.First().X));
                 }
             }
 
